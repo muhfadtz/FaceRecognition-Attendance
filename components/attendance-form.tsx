@@ -6,13 +6,25 @@ import { WebcamCapture } from "@/components/webcam-capture"
 import type { AttendanceFormProps } from "@/lib/types"
 import { useToast } from "@/hooks/use-toast"
 import { motion } from "framer-motion"
-import { AlertCircle, CheckCircle, Loader2, Camera, Zap } from "lucide-react"
+import { Loader2, Camera } from "lucide-react"
 
-// Pastikan AttendanceFormProps menggunakan tipe yang benar
 export function AttendanceForm({ onSuccess, onError, onLoading }: AttendanceFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [captureStatus, setCaptureStatus] = useState<"idle" | "capturing" | "processing">("idle")
   const { toast } = useToast()
+
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371000
+    const dLat = (lat2 - lat1) * (Math.PI / 180)
+    const dLon = (lon2 - lon1) * (Math.PI / 180)
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) *
+        Math.cos(lat2 * (Math.PI / 180)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2)
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    return R * c
+  }
 
   const handleCapture = async (imageSrc: string | null) => {
     if (!imageSrc) {
@@ -25,73 +37,96 @@ export function AttendanceForm({ onSuccess, onError, onLoading }: AttendanceForm
       return
     }
 
+    setIsSubmitting(true)
+    setCaptureStatus("processing")
+    onLoading(true)
+
+    toast({
+      title: "Memproses Absensi",
+      description: "Sedang memverifikasi identitas dan lokasi...",
+      duration: 2000,
+    })
+
+    const officeLat = parseFloat(process.env.NEXT_PUBLIC_OFFICE_LAT || "0");
+    const officeLng = parseFloat(process.env.NEXT_PUBLIC_OFFICE_LNG || "0");
+    const maxDistanceMeters = parseInt(process.env.NEXT_PUBLIC_MAX_DISTANCE_METERS || "0");
+
+
     try {
-      setIsSubmitting(true)
-      setCaptureStatus("processing")
-      onLoading(true)
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          try {
+            const { latitude, longitude } = pos.coords
+            const distance = calculateDistance(latitude, longitude, officeLat, officeLng)
 
-      // Show processing toast
+            if (distance > maxDistanceMeters) {
+              toast({
+                title: "Di Luar Area Kantor",
+                description: `Absensi hanya bisa dilakukan dalam radius ${maxDistanceMeters} meter dari kantor.`,
+                variant: "destructive",
+              })
+              onError("Lokasi di luar radius kantor.")
+              return
+            }
+
+            const response = await markAttendance(imageSrc, latitude, longitude)
+
+            if (response.success) {
+              console.log("✅ Respons Berhasil:", response)
+
+              toast({
+                title: "Absensi Berhasil! ✨",
+                description: `Selamat datang, ${response.nama || "Karyawan"}!`,
+                variant: "default",
+                duration: 5000,
+              })
+
+              onSuccess({
+                success: true,
+                nip: response.nip || "",
+                nama: response.nama || "",
+                timestamp: response.timestamp || new Date().toISOString(),
+                message: response.message || "Absensi berhasil dicatat!",
+                image: imageSrc,
+              })
+            } else {
+              throw new Error(response.message || "Gagal mencatat absensi")
+            }
+          } catch (err: any) {
+            toast({
+              title: "Gagal Absensi",
+              description: err.message,
+              variant: "destructive",
+            })
+            onError(err.message)
+          } finally {
+            setIsSubmitting(false)
+            setCaptureStatus("idle")
+            onLoading(false)
+          }
+        },
+        (err) => {
+          toast({
+            title: "Gagal Mengakses Lokasi",
+            description: "Izinkan akses lokasi untuk melakukan absensi.",
+            variant: "destructive",
+          })
+          onError("Gagal mendapatkan lokasi.")
+          setIsSubmitting(false)
+          setCaptureStatus("idle")
+          onLoading(false)
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      )
+    } catch (error: any) {
       toast({
-        title: "Memproses Absensi",
-        description: "Sedang memverifikasi identitas karyawan dan mencatat kehadiran...",
-        duration: 3000,
-      })
-
-      // imageSrc sudah berformat data URL: 'data:image/jpeg;base64,...'
-      // Jadi kita bisa langsung kirim imageSrc sebagai string lengkap
-      const response = await markAttendance(imageSrc)
-
-      if (response.success) {
-        // Success toast
-        toast({
-          title: "Absensi Berhasil! ✨",
-          description: `Selamat datang, ${response.nama || "Karyawan"}!`,
-          variant: "default",
-          duration: 5000,
-        })
-
-        onSuccess({
-          success: true,
-          nip: response.nip || "",
-          nama: response.nama || "",
-          timestamp: response.timestamp || new Date().toISOString(),
-          message: response.message || "Absensi berhasil dicatat!",
-          image: imageSrc, // Include the captured image
-        })
-
-        setCaptureStatus("idle")
-      } else {
-        throw new Error(response.message || "Gagal mencatat absensi")
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Terjadi kesalahan yang tidak terduga"
-
-      // Error toast with more specific messaging
-      let toastTitle = "Gagal Mencatat Absensi"
-      let toastDescription = errorMessage
-
-      if (errorMessage.toLowerCase().includes("wajah")) {
-        toastTitle = "Wajah Tidak Terdeteksi"
-        toastDescription = "Pastikan wajah Anda terlihat jelas dan coba lagi."
-      } else if (errorMessage.toLowerCase().includes("network") || errorMessage.toLowerCase().includes("connection")) {
-        toastTitle = "Masalah Koneksi"
-        toastDescription = "Periksa koneksi internet Anda dan coba lagi."
-      } else if (errorMessage.toLowerCase().includes("server")) {
-        toastTitle = "Server Error"
-        toastDescription = "Terjadi masalah pada server. Silakan coba beberapa saat lagi."
-      }
-
-      toast({
-        title: toastTitle,
-        description: toastDescription,
+        title: "Kesalahan Umum",
+        description: "Terjadi kesalahan saat memproses absensi.",
         variant: "destructive",
-        duration: 6000,
       })
-
-      onError(errorMessage)
-      setCaptureStatus("idle")
-    } finally {
+      onError("Terjadi kesalahan saat absensi.")
       setIsSubmitting(false)
+      setCaptureStatus("idle")
       onLoading(false)
     }
   }
@@ -122,7 +157,7 @@ export function AttendanceForm({ onSuccess, onError, onLoading }: AttendanceForm
         </div>
       </motion.div>
 
-      {/* Processing Overlay */}
+      {/* Overlay Loading */}
       {isSubmitting && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -134,39 +169,24 @@ export function AttendanceForm({ onSuccess, onError, onLoading }: AttendanceForm
               <div className="w-16 h-16 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full flex items-center justify-center mx-auto shadow-lg">
                 <Loader2 className="h-8 w-8 text-white animate-spin" />
               </div>
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Memproses Absensi</h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Sedang memverifikasi wajah dan mencatat kehadiran karyawan...
-                </p>
-              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Memproses Absensi</h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Sedang memverifikasi wajah dan mencatat kehadiran karyawan...
+              </p>
               <div className="flex justify-center space-x-1">
                 <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"></div>
-                <div
-                  className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"
-                  style={{ animationDelay: "0.1s" }}
-                ></div>
-                <div
-                  className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"
-                  style={{ animationDelay: "0.2s" }}
-                ></div>
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce delay-100"></div>
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce delay-200"></div>
               </div>
             </div>
           </div>
         </motion.div>
       )}
 
-      {/* Main Webcam Component */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-      >
+      {/* Webcam */}
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
         <WebcamCapture onCapture={handleCapture} />
       </motion.div>
-
-
-
     </div>
   )
 }

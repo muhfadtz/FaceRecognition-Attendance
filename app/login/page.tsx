@@ -40,8 +40,8 @@ export default function LoginPage() {
         }
 
         try {
-            // Gunakan Flask backend API
-            const res = await fetch("http://localhost:5000/api/login", {
+            const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
+            const res = await fetch(`${BASE_URL}/api/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
@@ -158,7 +158,7 @@ export default function LoginPage() {
                         </div>
                     </div>
 
-
+                    {/* block samping kanan */}
                     <div className="hidden lg:block lg:w-1/2 relative bg-gradient-to-br from-emerald-600 to-teal-700 overflow-hidden">
                         <div className="absolute inset-0 opacity-5">
                             <div className="absolute top-0 left-0 w-full h-full">

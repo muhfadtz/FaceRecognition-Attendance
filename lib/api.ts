@@ -1,5 +1,3 @@
-
-
 // Definisikan tipe data untuk respons registrasi
 export interface RegisterResponse {
   success: boolean
@@ -68,18 +66,30 @@ export async function registerAccount(
 /**
  * Fungsi untuk menandai absensi melalui API route Next.js.
  */
-export async function markAttendance(imageData: string): Promise<AttendanceResponse> {
+export async function markAttendance(
+  imageData: string,
+  latitude?: number,
+  longitude?: number
+): Promise<AttendanceResponse> {
   try {
+    // Ambil token dari localStorage jika pakai JWT (opsional, tergantung sistem auth)
+    const token = localStorage.getItem("token") // Jika pakai session cookie, abaikan bagian ini
+
     const response = await fetch("/api/absensi/tandai", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image: imageData }),
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}), // Tambahkan header Authorization jika ada token
+      },
+      credentials: "include", // WAJIB jika backend pakai session cookie
+      body: JSON.stringify({ image: imageData, latitude, longitude }),
     })
 
     const data = await response.json()
 
+    // Cek jika request ditolak
     if (!response.ok) {
-      throw new Error(data.message || `Gagal menandai absensi dari server. Status: ${response.status}`)
+      throw new Error(data.message || `Gagal menandai absensi. Status: ${response.status}`)
     }
 
     return {
@@ -94,10 +104,11 @@ export async function markAttendance(imageData: string): Promise<AttendanceRespo
     }
   } catch (error: any) {
     console.error("Error di fungsi markAttendance (lib/api.ts):", error)
+
     return {
       success: false,
-      message: error.message.includes("Unexpected token '<'")
-        ? "Terjadi kesalahan komunikasi dengan server (absensi). Pastikan endpoint API sudah benar dan server tidak error."
+      message: error.message?.includes("Unexpected token '<'")
+        ? "Terjadi kesalahan komunikasi dengan server absensi. Periksa apakah endpoint salah atau server error."
         : error.message || "Terjadi kesalahan saat menghubungi server absensi.",
     }
   }
@@ -108,7 +119,16 @@ export async function markAttendance(imageData: string): Promise<AttendanceRespo
  */
 export async function getDashboardData() {
   try {
-    const response = await fetch("/api/dashboard")
+    // Tambahkan timestamp untuk mencegah caching
+    const timestamp = new Date().getTime()
+    const response = await fetch(`/api/dashboard?t=${timestamp}`, {
+      method: "GET",
+      headers: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+      },
+    })
+
     const data = await response.json()
 
     if (!response.ok) {
@@ -118,6 +138,49 @@ export async function getDashboardData() {
     return data
   } catch (error: any) {
     console.error("Error getting dashboard data:", error)
+    throw error
+  }
+}
+
+/**
+ * Fungsi untuk mendapatkan data management dengan cache busting
+ */
+export async function getManagementData(month: string, year: string) {
+  try {
+    const timestamp = new Date().getTime()
+    const response = await fetch(`/api/karyawan/management?month=${month}&year=${year}&t=${timestamp}`, {
+      method: "GET",
+      headers: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+      },
+      next: { revalidate: 0 }, // Pastikan tidak di-cache oleh Next.js
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error("API Error Response:", errorText)
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    // Try to parse JSON
+    let data
+    try {
+      data = await response.json()
+    } catch (parseError) {
+      console.error("Failed to parse JSON:", parseError)
+      throw new Error("Respons server tidak valid. Silakan coba lagi.")
+    }
+
+    // Validasi data yang diterima
+    if (!data || !Array.isArray(data.employees)) {
+      console.error("Invalid data structure:", data)
+      throw new Error("Format data tidak valid")
+    }
+
+    return data
+  } catch (error: any) {
+    console.error("Error getting management data:", error)
     throw error
   }
 }
