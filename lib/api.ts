@@ -72,22 +72,25 @@ export async function markAttendance(
   longitude?: number
 ): Promise<AttendanceResponse> {
   try {
-    // Ambil token dari localStorage jika pakai JWT (opsional, tergantung sistem auth)
-    const token = localStorage.getItem("token") // Jika pakai session cookie, abaikan bagian ini
+    const token = localStorage.getItem("token")
 
-    const response = await fetch("/api/absensi/tandai", {
+    // Gunakan base URL dari env
+    const baseUrl = typeof window === "undefined"
+    ? process.env.INTERNAL_API_URL
+    : "";    const url = `${baseUrl}/api/absensi/tandai`
+
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}), // Tambahkan header Authorization jika ada token
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      credentials: "include", // WAJIB jika backend pakai session cookie
+      credentials: "include",
       body: JSON.stringify({ image: imageData, latitude, longitude }),
     })
 
     const data = await response.json()
 
-    // Cek jika request ditolak
     if (!response.ok) {
       throw new Error(data.message || `Gagal menandai absensi. Status: ${response.status}`)
     }
@@ -113,6 +116,7 @@ export async function markAttendance(
     }
   }
 }
+
 
 /**
  * Fungsi untuk mendapatkan data dashboard
