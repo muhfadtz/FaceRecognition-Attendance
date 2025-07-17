@@ -172,6 +172,15 @@ model Nilai {
   @@map("Nilai")
 }
 
+model PengaturanPendaftaran {
+  id        Int      @id @default(autoincrement())
+  isAktif   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("PengaturanPendaftaran")
+}
+
 
 /// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
 // model admin {

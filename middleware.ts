@@ -1,7 +1,18 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-export function middleware(request: NextRequest) {
+async function isPendaftaranAktif(request: NextRequest): Promise<boolean> {
+    try {
+        const response = await fetch(new URL("/api/pengaturan/pendaftaran", request.url));
+        if (!response.ok) return false;
+        const data = await response.json();
+        return data.isAktif;
+    } catch (error) {
+        return false;
+    }
+}
+
+export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl
 
     // Get role from cookies or headers (since we can't access localStorage in middleware)
@@ -21,7 +32,7 @@ export function middleware(request: NextRequest) {
     const siswaDashboard = "/dashboard/siswa";
 
     // Public routes that don't need authentication
-    const publicRoutes = ["/login", "/register"]
+    const publicRoutes = ["/login", "/register", "/pendaftaran", "/pendaftaran-ditutup"]
 
     // Check if current path is an admin route
     const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route))
@@ -31,6 +42,14 @@ export function middleware(request: NextRequest) {
 
     // Check if current path is a public route
     const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route))
+
+    // Handle public registration route
+    if (pathname.startsWith("/pendaftaran")) {
+        const pendaftaranAktif = await isPendaftaranAktif(request);
+        if (!pendaftaranAktif) {
+            return NextResponse.redirect(new URL("/pendaftaran-ditutup", request.url));
+        }
+    }
 
     // If no role is set and trying to access protected routes, redirect to login
     if (!role && !isPublicRoute) {
