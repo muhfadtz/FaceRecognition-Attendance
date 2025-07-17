@@ -51,6 +51,12 @@ model Karyawan {
   password       String?
   status         Role           @default(Siswa)
   catatanAbsensi CatatanAbsensi[]
+  uangSekolah    UangSekolah[]
+  jadwalMengajar JadwalPelajaran[]
+  kelasId        Int?
+  kelas          Kelas?         @relation("SiswaKelas", fields: [kelasId], references: [id])
+  kelasDiwalikan Kelas[]        @relation("WaliKelas")
+  rapor          Rapor[]
 
   @@map("Karyawan")
 }
@@ -65,6 +71,107 @@ model HariLibur {
   @@index([tanggal])
   @@map("HariLibur")
 }
+
+model UangSekolah {
+  id          Int      @id @default(autoincrement())
+  siswaId     Int
+  siswa       Karyawan @relation(fields: [siswaId], references: [id])
+  bulan       Int
+  tahun       Int
+  jumlah      Int
+  status      String   @default("Belum Lunas") // Belum Lunas, Lunas
+  tanggalBayar DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("UangSekolah")
+}
+
+model TahunAkademik {
+  id        Int      @id @default(autoincrement())
+  tahun     String   // e.g., "2024/2025"
+  semester  String   // e.g., "Ganjil" or "Genap"
+  isActive  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  jadwal    JadwalPelajaran[]
+  rapor     Rapor[]
+
+  @@map("TahunAkademik")
+}
+
+model MataPelajaran {
+  id          Int      @id @default(autoincrement())
+  nama        String
+  deskripsi   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  jadwal      JadwalPelajaran[]
+  nilai       Nilai[]
+
+  @@map("MataPelajaran")
+}
+
+model Kelas {
+  id          Int      @id @default(autoincrement())
+  nama        String   // e.g., "X IPA 1"
+  walikelasId Int?
+  walikelas   Karyawan? @relation("WaliKelas", fields: [walikelasId], references: [id])
+  siswa       Karyawan[] @relation("SiswaKelas")
+  jadwal      JadwalPelajaran[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("Kelas")
+}
+
+model JadwalPelajaran {
+  id              Int          @id @default(autoincrement())
+  tahunAkademikId Int
+  tahunAkademik   TahunAkademik @relation(fields: [tahunAkademikId], references: [id])
+  kelasId         Int
+  kelas           Kelas        @relation(fields: [kelasId], references: [id])
+  mataPelajaranId Int
+  mataPelajaran   MataPelajaran @relation(fields: [mataPelajaranId], references: [id])
+  guruId          Int
+  guru            Karyawan     @relation(fields: [guruId], references: [id])
+  hari            String       // e.g., "Senin"
+  waktuMulai      String       // e.g., "07:00"
+  waktuSelesai    String       // e.g., "08:30"
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@map("JadwalPelajaran")
+}
+
+model Rapor {
+  id              Int      @id @default(autoincrement())
+  siswaId         Int
+  siswa           Karyawan @relation(fields: [siswaId], references: [id])
+  tahunAkademikId Int
+  tahunAkademik   TahunAkademik @relation(fields: [tahunAkademikId], references: [id])
+  catatanWalikelas String?
+  nilai           Nilai[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("Rapor")
+}
+
+model Nilai {
+  id              Int      @id @default(autoincrement())
+  raporId         Int
+  rapor           Rapor    @relation(fields: [raporId], references: [id])
+  mataPelajaranId Int
+  mataPelajaran   MataPelajaran @relation(fields: [mataPelajaranId], references: [id])
+  nilai           Int
+  catatanGuru     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("Nilai")
+}
+
 
 /// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
 // model admin {
