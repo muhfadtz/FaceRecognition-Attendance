@@ -7,6 +7,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  Teacher
+  Walikelas
+  KepalaSekolah
+  Siswa
+}
+
 model CatatanAbsensi {
   id                Int      @id @default(autoincrement())
   timestamp_absensi DateTime
@@ -42,7 +49,7 @@ model Karyawan {
   face_embedding String?
   email          String?          @unique
   password       String?
-  status         String           @default("Guru") // New status field
+  status         Role           @default(Siswa)
   catatanAbsensi CatatanAbsensi[]
 
   @@map("Karyawan")

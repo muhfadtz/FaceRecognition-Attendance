@@ -14,6 +14,12 @@ export function middleware(request: NextRequest) {
     // Protected user routes
     const userRoutes = ["/"]
 
+    // Role-based dashboards
+    const teacherDashboard = "/dashboard/teacher";
+    const walikelasDashboard = "/dashboard/walikelas";
+    const kepalaSekolahDashboard = "/dashboard/kepala_sekolah";
+    const siswaDashboard = "/dashboard/siswa";
+
     // Public routes that don't need authentication
     const publicRoutes = ["/login", "/register"]
 
@@ -47,6 +53,18 @@ export function middleware(request: NextRequest) {
         } else if (role === "user") {
             const homeUrl = new URL("/", request.url)
             return NextResponse.redirect(homeUrl)
+        } else if (role === "Teacher") {
+            const dashboardUrl = new URL(teacherDashboard, request.url);
+            return NextResponse.redirect(dashboardUrl);
+        } else if (role === "Walikelas") {
+            const dashboardUrl = new URL(walikelasDashboard, request.url);
+            return NextResponse.redirect(dashboardUrl);
+        } else if (role === "KepalaSekolah") {
+            const dashboardUrl = new URL(kepalaSekolahDashboard, request.url);
+            return NextResponse.redirect(dashboardUrl);
+        } else if (role === "Siswa") {
+            const dashboardUrl = new URL(siswaDashboard, request.url);
+            return NextResponse.redirect(dashboardUrl);
         }
     }
 
@@ -79,6 +97,20 @@ export function middleware(request: NextRequest) {
     if (role === "admin" && pathname === "/") {
         const dashboardUrl = new URL("/dashboard", request.url)
         return NextResponse.redirect(dashboardUrl)
+    }
+
+    // Protect role-based dashboards
+    if (pathname.startsWith("/dashboard/teacher") && role !== "Teacher") {
+        return NextResponse.redirect(new URL("/login", request.url));
+    }
+    if (pathname.startsWith("/dashboard/walikelas") && role !== "Walikelas") {
+        return NextResponse.redirect(new URL("/login", request.url));
+    }
+    if (pathname.startsWith("/dashboard/kepala_sekolah") && role !== "KepalaSekolah") {
+        return NextResponse.redirect(new URL("/login", request.url));
+    }
+    if (pathname.startsWith("/dashboard/siswa") && role !== "Siswa") {
+        return NextResponse.redirect(new URL("/login", request.url));
     }
 
     // Add cache control headers to all responses
