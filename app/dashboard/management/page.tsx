@@ -13,7 +13,9 @@ import {
   RefreshCw,
   Calendar,
   Edit,
+  UserPlus,
 } from "lucide-react"
+import PendaftaranSettings from "@/components/pendaftaran-settings";
 import MonthSelector from "@/components/month-selector"
 import { getManagementData } from "@/lib/api"
 
@@ -118,7 +120,7 @@ export default function ManagementPage() {
   })
 
   // Tambahkan state untuk holiday management
-  const [activeTab, setActiveTab] = useState<"schedule" | "holidays">("schedule")
+  const [activeTab, setActiveTab] = useState<"schedule" | "holidays" | "pendaftaran">("schedule")
   const [isAddingHoliday, setIsAddingHoliday] = useState(false)
   const [editingHoliday, setEditingHoliday] = useState<Holiday | null>(null)
   const [holidayForm, setHolidayForm] = useState({
@@ -1314,7 +1316,23 @@ export default function ManagementPage() {
                 <Calendar className="h-4 w-4 inline-block mr-2" />
                 Hari Libur
               </button>
+              <button
+                onClick={() => setActiveTab("pendaftaran")}
+                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === "pendaftaran"
+                    ? "border-emerald-500 text-emerald-600 dark:text-emerald-400"
+                    : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                }`}
+              >
+                <UserPlus className="h-4 w-4 inline-block mr-2" />
+                Pendaftaran
+              </button>
             </div>
+
+            {/* Pendaftaran Tab Content */}
+            {activeTab === "pendaftaran" && (
+              <PendaftaranSettings />
+            )}
 
             {/* Schedule Tab Content */}
             {activeTab === "schedule" && (

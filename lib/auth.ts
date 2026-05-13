@@ -1,6 +1,6 @@
 // Helper functions for managing authentication cookies
 
-export function setUserRole(role: "admin" | "user") {
+export function setUserRole(role: "admin" | "user" | "Teacher" | "Walikelas" | "KepalaSekolah" | "Siswa") {
     // Set cookie that expires in 7 days
     const expires = new Date()
     expires.setDate(expires.getDate() + 7)
@@ -64,6 +64,26 @@ export function isAdmin(): boolean {
 export function isUser(): boolean {
     const role = getUserRole()
     return role === "user"
+}
+
+export function isTeacher(): boolean {
+    const role = getUserRole()
+    return role === "Teacher"
+}
+
+export function isWalikelas(): boolean {
+    const role = getUserRole()
+    return role === "Walikelas"
+}
+
+export function isKepalaSekolah(): boolean {
+    const role = getUserRole()
+    return role === "KepalaSekolah"
+}
+
+export function isSiswa(): boolean {
+    const role = getUserRole()
+    return role === "Siswa"
 }
 
 // Function to get user data from localStorage

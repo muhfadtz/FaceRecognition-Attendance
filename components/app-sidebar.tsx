@@ -2,7 +2,7 @@
 
 import { Users, UserPlus, LogOut, HomeIcon as HouseIcon, Settings, FileText, GraduationCap } from "lucide-react"
 import { useRouter, usePathname } from "next/navigation"
-import { logout } from "@/lib/auth"
+import { logout, getUserRole } from "@/lib/auth"
 import {
     Sidebar,
     SidebarContent,
@@ -16,30 +16,47 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from "@/components/ui/sidebar"
+import { useEffect, useState } from "react"
 
-const navigation = [
-    {
-        name: "Dashboard",
-        href: "/dashboard",
-        icon: HouseIcon,
-    },
-    {
-        name: "Manajemen",
-        href: "/dashboard/management",
-        icon: Users,
-    },
-    {
-        name: "Pendaftaran",
-        href: "/dashboard/registration",
-        icon: UserPlus,
-    },
-
-]
+const getNavigationForRole = (role: string | null) => {
+    switch (role) {
+        case "Teacher":
+            return [
+                { name: "Dashboard", href: "/dashboard/teacher", icon: HouseIcon },
+            ];
+        case "Walikelas":
+            return [
+                { name: "Dashboard", href: "/dashboard/walikelas", icon: HouseIcon },
+            ];
+        case "KepalaSekolah":
+            return [
+                { name: "Dashboard", href: "/dashboard/kepala_sekolah", icon: HouseIcon },
+            ];
+        case "Siswa":
+            return [
+                { name: "Dashboard", href: "/dashboard/siswa", icon: HouseIcon },
+            ];
+        case "admin":
+            return [
+                { name: "Dashboard", href: "/dashboard", icon: HouseIcon },
+                { name: "Manajemen", href: "/dashboard/management", icon: Users },
+                { name: "Pendaftaran", href: "/dashboard/registration", icon: UserPlus },
+            ];
+        default:
+            return [];
+    }
+};
 
 export function AppSidebar() {
     const router = useRouter()
     const pathname = usePathname()
     const { close } = useSidebar()
+    const [navigation, setNavigation] = useState<any[]>([]);
+
+    useEffect(() => {
+        const role = getUserRole();
+        setNavigation(getNavigationForRole(role));
+    }, []);
 
     const handleLogout = async () => {
         if (confirm("Apakah Anda yakin ingin keluar?")) {
