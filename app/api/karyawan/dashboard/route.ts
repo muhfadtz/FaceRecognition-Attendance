@@ -17,9 +17,18 @@ export async function GET() {
     const todayStart = now.startOf("day").toDate()
     const todayEnd = now.endOf("day").toDate()
 
-    const pengaturan = await prisma.pengaturanAbsensi.findFirst()
+    let pengaturan = await prisma.pengaturanAbsensi.findFirst()
     if (!pengaturan) {
-      return NextResponse.json({ error: "Pengaturan absen tidak ditemukan" }, { status: 404 })
+      pengaturan = await prisma.pengaturanAbsensi.create({
+        data: {
+          waktuMulaiAbsen: "07:00",
+          batasTepatWaktu: "09:00",
+          batasTerlambat: "14:00",
+          waktuMulaiPulang: "16:00",
+          batasWaktuPulang: "18:00",
+          hariKerja: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"],
+        }
+      })
     }
 
     const waktuMulaiPulang = dayjs(`${now.format("YYYY-MM-DD")}T${pengaturan.waktuMulaiPulang}:00`).tz("Asia/Jakarta")

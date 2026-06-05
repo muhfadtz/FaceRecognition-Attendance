@@ -1,6 +1,7 @@
 "use client"
 
-import { Users, UserPlus, LogOut, HomeIcon as HouseIcon, Settings, FileText, GraduationCap } from "lucide-react"
+import { useState } from "react"
+import { Users, UserPlus, LogOut, HomeIcon as HouseIcon, Settings, FileText, Shield } from "lucide-react"
 import { useRouter, usePathname } from "next/navigation"
 import { logout } from "@/lib/auth"
 import {
@@ -16,6 +17,7 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from "@/components/ui/sidebar"
+import { ConfirmModal } from "@/components/ui/confirm-modal"
 
 const navigation = [
     {
@@ -24,12 +26,12 @@ const navigation = [
         icon: HouseIcon,
     },
     {
-        name: "Manajemen",
+        name: "Management",
         href: "/dashboard/management",
         icon: Users,
     },
     {
-        name: "Pendaftaran",
+        name: "Registration",
         href: "/dashboard/registration",
         icon: UserPlus,
     },
@@ -40,22 +42,20 @@ export function AppSidebar() {
     const router = useRouter()
     const pathname = usePathname()
     const { close } = useSidebar()
+    const [showLogoutModal, setShowLogoutModal] = useState(false)
 
     const handleLogout = async () => {
-        if (confirm("Apakah Anda yakin ingin keluar?")) {
-            try {
-                const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
-                await fetch(`${BASE_URL}/api/logout`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                })
-            } catch (error) {
-                console.log("Logout API call failed, but continuing with local logout")
-            }
-
-            // Use the enhanced logout function from auth.ts
-            logout()
+        try {
+            const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
+            await fetch(`${BASE_URL}/api/logout`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+            })
+        } catch (error) {
+            console.log("Logout API call failed, but continuing with local logout")
         }
+
+        logout()
     }
 
     const handleNavigation = (href: string) => {
@@ -64,23 +64,21 @@ export function AppSidebar() {
     }
 
     return (
-        <Sidebar className="flex flex-col h-full bg-gradient-to-b from-emerald-50 to-teal-50 dark:from-gray-900 dark:to-gray-800 border-r border-emerald-100 dark:border-gray-700">
-            <SidebarHeader className="border-b border-emerald-100 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 p-4">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
-                        <GraduationCap className="h-5 w-5 lg:h-7 lg:w-7 text-white" />
-                    </div>
+        <>
+        <Sidebar className="flex flex-col h-full bg-background border-r border-border">
+            <SidebarHeader className="border-b border-border bg-background p-4">
+                <div className="flex items-center">
                     <div className="min-w-0 flex-1">
-                        <h2 className="text-base lg:text-lg font-bold text-gray-900 dark:text-white truncate">Admin Dashboard</h2>
-                        <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium truncate">MAS Al Ittihadiyah</p>
+                        <h2 className="text-lg font-bold text-foreground truncate title-serif">Staffora<span className="text-foreground">.</span></h2>
+                        <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider truncate mono-label">Enterprise Portal</p>
                     </div>
                 </div>
             </SidebarHeader>
 
             <SidebarContent className="bg-transparent flex-1 overflow-y-auto">
                 <SidebarGroup>
-                    <SidebarGroupLabel className="text-emerald-700 dark:text-emerald-300 font-semibold px-4 py-2">
-                        Menu Utama
+                    <SidebarGroupLabel className="text-muted-foreground font-bold px-4 py-2 uppercase tracking-wider mono-label !text-[10px]">
+                        Main Menu
                     </SidebarGroupLabel>
                     <SidebarGroupContent className="px-2">
                         <SidebarMenu>
@@ -92,12 +90,12 @@ export function AppSidebar() {
                                             onClick={() => handleNavigation(item.href)}
                                             isActive={isActive}
                                             className={`w-full justify-start gap-3 transition-all duration-200 mx-2 my-1 ${isActive
-                                                ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg hover:from-emerald-600 hover:to-teal-700"
-                                                : "text-gray-700 dark:text-gray-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/20 hover:text-emerald-700 dark:hover:text-emerald-300"
+                                                ? "bg-primary text-primary-foreground shadow-sm font-semibold"
+                                                : "text-foreground hover:bg-accent/10 hover:text-accent font-medium"
                                                 }`}
                                         >
                                             <item.icon className="h-4 w-4 flex-shrink-0" />
-                                            <span className="font-medium truncate">{item.name}</span>
+                                            <span className="truncate">{item.name}</span>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
                                 )
@@ -111,19 +109,29 @@ export function AppSidebar() {
 
             </SidebarContent>
 
-            <SidebarFooter className="border-t border-emerald-100 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 p-4">
+            <SidebarFooter className="border-t border-border bg-background p-4">
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton
-                            onClick={handleLogout}
-                            className="w-full justify-start gap-3 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20 transition-all duration-200 font-medium"
+                            onClick={() => setShowLogoutModal(true)}
+                            className="w-full justify-start gap-3 text-red-600 hover:text-red-500 hover:bg-red-500/10 dark:hover:bg-red-500/20 transition-all duration-200 font-semibold"
                         >
                             <LogOut className="h-4 w-4 flex-shrink-0" />
-                            <span className="truncate">Keluar</span>
+                            <span className="truncate">Sign Out</span>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>
         </Sidebar>
+        <ConfirmModal
+            open={showLogoutModal}
+            onOpenChange={setShowLogoutModal}
+            title="Sign Out"
+            description="Apakah Anda yakin ingin keluar? Anda akan diarahkan ke halaman login."
+            confirmLabel="Sign Out"
+            cancelLabel="Batal"
+            onConfirm={handleLogout}
+        />
+        </>
     )
 }

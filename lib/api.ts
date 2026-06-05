@@ -121,7 +121,7 @@ export async function getDashboardData() {
   try {
     // Tambahkan timestamp untuk mencegah caching
     const timestamp = new Date().getTime()
-    const response = await fetch(`/api/dashboard?t=${timestamp}`, {
+    const response = await fetch(`/api/karyawan/dashboard?t=${timestamp}`, {
       method: "GET",
       headers: {
         "Cache-Control": "no-cache, no-store, must-revalidate",

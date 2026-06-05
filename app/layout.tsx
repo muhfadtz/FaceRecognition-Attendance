@@ -5,8 +5,8 @@ import { ModeToggle } from "@/components/mode-toggle"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "Aplikasi Manajemen - MAS Al Ittihadiyah Medan",
-  description: "Sistem manajemen absensi digital untuk Madrasah Aliyah Swasta Al Ittihadiyah Medan",
+  title: "Staffora - Enterprise Face Recognition Attendance",
+  description: "Next-generation smart attendance and face recognition platform for modern businesses.",
 }
 
 export default function RootLayout({

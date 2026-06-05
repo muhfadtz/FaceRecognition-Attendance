@@ -63,12 +63,18 @@ export async function POST(req: Request) {
       }, { status: 404 })
     }
 
-    const pengaturan = await prisma.pengaturanAbsensi.findFirst()
+    let pengaturan = await prisma.pengaturanAbsensi.findFirst()
     if (!pengaturan) {
-      return NextResponse.json({
-        success: false,
-        message: 'Pengaturan absensi tidak ditemukan.',
-      }, { status: 500 })
+      pengaturan = await prisma.pengaturanAbsensi.create({
+        data: {
+          waktuMulaiAbsen: "07:00",
+          batasTepatWaktu: "09:00",
+          batasTerlambat: "14:00",
+          waktuMulaiPulang: "16:00",
+          batasWaktuPulang: "18:00",
+          hariKerja: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"],
+        }
+      })
     }
 
     const now = new Date()

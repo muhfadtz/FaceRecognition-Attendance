@@ -56,73 +56,51 @@ export function WebcamCapture({ onCapture }: WebcamCaptureProps) {
         transition={{ duration: 0.5 }}
         className="relative w-full"
       >
-        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-gray-800 dark:to-gray-700 p-3 shadow-2xl border-2 border-emerald-200 dark:border-gray-600">
-          {/* Camera Container */}
-          <div className="relative rounded-xl overflow-hidden bg-black shadow-inner">
+        <div className="relative rounded-lg overflow-hidden bg-neutral-100 p-2 border border-neutral-200 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+          <div className="relative rounded-md overflow-hidden bg-black">
             <Webcam
               audio={false}
               ref={webcamRef}
               screenshotFormat="image/jpeg"
               videoConstraints={videoConstraints}
               onUserMedia={handleUserMedia}
-              className="w-full h-auto rounded-xl"
+              className="w-full h-auto rounded-md"
               height={720}
               width={1280}
             />
 
-
-
-            {/* Camera Controls Overlay */}
-            <div className="absolute top-4 right-4 flex gap-2">
+            <div className="absolute top-3 right-3 flex gap-2">
               <Button
                 variant="outline"
                 size="icon"
                 onClick={toggleCamera}
-                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm hover:bg-white dark:hover:bg-gray-700 border-emerald-200 dark:border-gray-600 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110"
+                className="bg-white/90 backdrop-blur-sm hover:bg-white border-neutral-200 shadow-lg"
                 aria-label="Switch camera"
               >
-                <RotateCcw className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                <RotateCcw className="h-4 w-4 text-neutral-600" />
               </Button>
             </div>
-
-
           </div>
         </div>
       </motion.div>
 
-      {/* Enhanced Capture Button */}
-      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full">
+      <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }} className="w-full">
         <Button
           onClick={captureImage}
           disabled={isLoading || !isReady}
-          className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:from-gray-400 disabled:to-gray-500 text-white h-16 text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl disabled:shadow-none rounded-xl border-0 relative overflow-hidden group"
-          aria-label="Capture image and mark attendance"
+          className="w-full bg-neutral-900 hover:bg-neutral-800 disabled:bg-neutral-300 text-white h-14 text-base font-semibold transition-all duration-200 shadow-sm hover:shadow-md disabled:shadow-none rounded-lg border-0"
+          aria-label="Capture image"
         >
-          {/* Button Background Animation */}
-          <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-teal-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-
-          {/* Button Content */}
-          <div className="relative z-10 flex items-center justify-center">
+          <div className="flex items-center justify-center">
             {isLoading ? (
               <>
-                <Loader2 className="mr-3 h-6 w-6 animate-spin" />
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                 <span>Mengambil Foto...</span>
-                <div className="ml-3 flex space-x-1">
-                  <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
-                  <div
-                    className="w-2 h-2 bg-white rounded-full animate-bounce"
-                    style={{ animationDelay: "0.1s" }}
-                  ></div>
-                  <div
-                    className="w-2 h-2 bg-white rounded-full animate-bounce"
-                    style={{ animationDelay: "0.2s" }}
-                  ></div>
-                </div>
               </>
             ) : (
               <>
-                <Camera className="mr-3 h-6 w-6" />
-                <span>Ambil Foto Absensi</span>
+                <Camera className="mr-2 h-5 w-5" />
+                <span>Ambil Foto</span>
               </>
             )}
           </div>

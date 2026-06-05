@@ -85,7 +85,7 @@ export default function SignUpPage() {
     return (
         <>
             <Navbar />
-            <main className="container mx-auto px-4 py-8 flex flex-col items-center min-h-[calc(100vh-var(--navbar-height,4rem))]">
+            <main className="container mx-auto px-4 py-8 flex flex-col items-center min-h-[calc(100vh-4rem)]">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -93,36 +93,20 @@ export default function SignUpPage() {
                     className="w-full max-w-md space-y-6"
                 >
                     <div className="text-center">
-                        <h1 className="text-3xl font-bold mb-2">Pendaftaran Akun Karyawan</h1>
-                        <p className="text-muted-foreground">Isi data dan ambil foto wajah Anda.</p>
+                        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Pendaftaran Karyawan</h1>
+                        <p className="text-sm text-neutral-500">Isi data dan ambil foto wajah Anda.</p>
                     </div>
 
-                    <div className="space-y-4 p-6 bg-card border rounded-lg shadow">
-                        <div>
-                            <label htmlFor="nama" className="block text-sm font-medium text-card-foreground mb-1">
-                                Nama Lengkap
-                            </label>
-                            <Input
-                                id="nama"
-                                type="text"
-                                value={nama}
-                                onChange={handleChange(setNama)}
-                                className="mt-1 block w-full"
-                                placeholder="Masukkan nama lengkap" required disabled={isSubmitting}
-                            />
+                    <div className="space-y-4 p-6 bg-white border border-neutral-200 rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+                        <div className="space-y-1.5">
+                            <label htmlFor="nama" className="text-xs font-semibold text-neutral-600">Nama Lengkap</label>
+                            <Input id="nama" type="text" value={nama} onChange={handleChange(setNama)}
+                                placeholder="Masukkan nama lengkap" required disabled={isSubmitting} />
                         </div>
-                        <div>
-                            <label htmlFor="nip" className="block text-sm font-medium text-card-foreground mb-1">
-                                NIP (Nomor Induk Pegawai)
-                            </label>
-                            <Input
-                                id="nip"
-                                type="text"
-                                value={nip}
-                                onChange={handleChange(setNip)}
-                                className="mt-1 block w-full"
-                                placeholder="Masukkan NIP" required disabled={isSubmitting}
-                            />
+                        <div className="space-y-1.5">
+                            <label htmlFor="nip" className="text-xs font-semibold text-neutral-600">NIP (Nomor Induk Pegawai)</label>
+                            <Input id="nip" type="text" value={nip} onChange={handleChange(setNip)}
+                                placeholder="Masukkan NIP" required disabled={isSubmitting} />
                         </div>
                     </div>
 
@@ -131,37 +115,29 @@ export default function SignUpPage() {
 
                     {imageSrc && !isSubmitting && (
                         <div className="text-center">
-                            <p className="text-sm text-muted-foreground mb-2">Preview Foto:</p>
-                            <img src={imageSrc} alt="Preview" className="w-48 h-auto rounded border mx-auto" />
+                            <p className="text-xs text-neutral-500 mb-2">Preview Foto:</p>
+                            <img src={imageSrc} alt="Preview" className="w-48 h-auto rounded-lg border border-neutral-200 mx-auto" />
                         </div>
                     )}
 
                     {submitMessage && (
-                        <p className={`text-sm text-center p-3 rounded-md ${submitMessage.includes('berhasil')
-                            ? 'bg-green-50 text-green-700 dark:bg-green-700/20 dark:text-green-300'
-                            : 'bg-red-50 text-red-700 dark:bg-red-700/20 dark:text-red-300'
+                        <p className={`text-sm text-center p-3 rounded-lg ${submitMessage.includes('berhasil')
+                            ? 'bg-green-50 text-green-700'
+                            : 'bg-red-50 text-red-700'
                             }`}>
                             {submitMessage}
                         </p>
                     )}
 
-                    <Button
-                        onClick={handleSubmit}
-                        disabled={!nama || !nip || !imageSrc || isSubmitting}
-                        size="lg"
-                        className="w-full"
-                    >
+                    <Button onClick={handleSubmit} disabled={!nama || !nip || !imageSrc || isSubmitting} size="lg" className="w-full">
                         {isSubmitting ? (
-                            <>
-                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                Mendaftarkan...
-                            </>
+                            <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Mendaftarkan...</>
                         ) : 'Daftar Akun'}
                     </Button>
                 </motion.div>
 
-                <footer className="w-full mt-auto pt-8 pb-4 text-center text-sm text-gray-500">
-                    <p>© {new Date().getFullYear()} Face Attendance System</p>
+                <footer className="w-full mt-auto pt-8 pb-4 text-center text-sm text-neutral-500">
+                    <p>&copy; {new Date().getFullYear()} Staffora Enterprise Portal</p>
                 </footer>
             </main>
         </>
