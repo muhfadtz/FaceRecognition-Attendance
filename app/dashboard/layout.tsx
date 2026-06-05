@@ -11,7 +11,7 @@ export default function DashboardLayout({
     return (
         <AuthGuard requiredRole="admin">
             <SidebarProvider>
-                <div className="flex h-screen bg-white">
+                <div className="flex h-screen bg-background">
                     <AppSidebar />
                     <main className="flex-1 overflow-auto">{children}</main>
                 </div>

@@ -708,12 +708,12 @@ export default function ManagementPage() {
           </div>
           <Skeleton className="h-10 w-28 rounded-lg" />
         </div>
-        <div className="flex flex-col lg:flex-row gap-4 p-6 bg-white rounded-lg border border-neutral-200 shadow-[0_1px_2px_rgba(0,0,0,0.04)] mb-6">
+        <div className="flex flex-col lg:flex-row gap-4 p-6 bg-card rounded-md border border-border shadow-[0_1px_2px_rgba(0,0,0,0.04)] mb-6">
           <Skeleton className="h-10 flex-1 rounded-lg" />
           <Skeleton className="h-10 w-48 rounded-lg" />
           <Skeleton className="h-10 w-32 rounded-lg" />
         </div>
-        <div className="bg-white rounded-lg border border-neutral-200 shadow-[0_1px_2px_rgba(0,0,0,0.04)] overflow-hidden p-6">
+        <div className="bg-card rounded-md border border-border shadow-[0_1px_2px_rgba(0,0,0,0.04)] overflow-hidden p-6">
           <div className="space-y-4">
             <div className="flex gap-4 border-b border-neutral-200 pb-4">
               <Skeleton className="h-6 w-16 rounded-md" />
@@ -784,7 +784,7 @@ export default function ManagementPage() {
       </div>
 
       {/* Status Absensi */}
-      <div className="bg-white rounded-lg border border-neutral-200 shadow-[0_1px_2px_rgba(0,0,0,0.04)] p-4 mb-6">
+      <div className="bg-card rounded-md border border-border shadow-[0_1px_2px_rgba(0,0,0,0.04)] p-4 mb-6">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-xs font-semibold uppercase tracking-widest text-neutral-600">Status Absensi</h3>
           <div className="flex items-center">
@@ -825,7 +825,7 @@ export default function ManagementPage() {
       </div>
 
       {/* Search and Filter */}
-      <div className="flex flex-col lg:flex-row gap-4 p-6 bg-white rounded-lg border border-neutral-200 shadow-[0_1px_2px_rgba(0,0,0,0.04)] mb-6">
+      <div className="flex flex-col lg:flex-row gap-4 p-6 bg-card rounded-md border border-border shadow-[0_1px_2px_rgba(0,0,0,0.04)] mb-6">
         <div className="flex-1 relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
           <input type="text" placeholder="Cari nama atau NIP..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
@@ -839,7 +839,7 @@ export default function ManagementPage() {
       </div>
 
       {/* Attendance Table */}
-      <div className="bg-white rounded-lg border border-neutral-200 shadow-[0_1px_2px_rgba(0,0,0,0.04)] overflow-hidden">
+      <div className="bg-card rounded-md border border-border shadow-[0_1px_2px_rgba(0,0,0,0.04)] overflow-hidden">
         <div className="flex relative">
           {/* Fixed Left Column - Employee Info */}
           <div className="sticky left-0 z-10">
@@ -848,46 +848,46 @@ export default function ManagementPage() {
                 <tr>
                   <th
                     colSpan={3}
-                    className="h-12 bg-secondary/80 dark:bg-primary/20 px-4 text-center text-sm font-semibold text-gray-900 dark:text-white border-b border-r border-border dark:border-gray-600"
+                    className="h-12 bg-secondary px-4 text-center text-sm font-semibold text-foreground border-b border-r border-border dark:border-gray-700"
                   >
                     Informasi Karyawan
                   </th>
                 </tr>
                 <tr>
-                  <th className="h-10 w-16 px-3 bg-secondary dark:bg-primary/10 text-center text-xs font-medium text-gray-700 dark:text-gray-300 border-b border-r">
+                  <th className="h-10 w-16 px-3 bg-secondary text-center text-xs font-medium text-foreground border-b border-r">
                     No
                   </th>
-                  <th className="h-10 w-48 px-3 bg-secondary dark:bg-primary/10 text-center text-xs font-medium text-gray-700 dark:text-gray-300 border-b border-r">
+                  <th className="h-10 w-48 px-3 bg-secondary text-center text-xs font-medium text-foreground border-b border-r">
                     Nama
                   </th>
-                  <th className="h-10 w-36 px-3 bg-secondary dark:bg-primary/10 text-center text-xs font-medium text-gray-700 dark:text-gray-300 border-b border-r">
+                  <th className="h-10 w-36 px-3 bg-secondary text-center text-xs font-medium text-foreground border-b border-r">
                     NIP
                   </th>
                 </tr>
                 <tr>
-                  <th className="h-8 w-16 bg-secondary dark:bg-primary/10 border-b border-r"></th>
-                  <th className="h-8 w-48 bg-secondary dark:bg-primary/10 border-b border-r"></th>
-                  <th className="h-8 w-36 bg-secondary dark:bg-primary/10 border-b border-r"></th>
+                  <th className="h-8 w-16 bg-secondary border-b border-r"></th>
+                  <th className="h-8 w-48 bg-secondary border-b border-r"></th>
+                  <th className="h-8 w-36 bg-secondary border-b border-r"></th>
                 </tr>
               </thead>
               <tbody>
                 {filteredEmployees.length > 0 ? (
                   filteredEmployees.map((emp, i) => (
                     <tr key={emp.id} className="hover:bg-secondary dark:hover:bg-primary/5 transition-colors">
-                      <td className="h-16 w-16 px-3 text-center text-sm border-b border-r bg-white dark:bg-gray-800 align-middle">
+                      <td className="h-16 w-16 px-3 text-center text-sm border-b border-r bg-card align-middle">
                         {i + 1}
                       </td>
-                      <td className="h-16 w-48 px-3 text-center text-sm border-b border-r bg-white dark:bg-gray-800 align-middle">
+                      <td className="h-16 w-48 px-3 text-center text-sm border-b border-r bg-card align-middle">
                         {emp.name}
                       </td>
-                      <td className="h-16 w-36 px-3 text-center text-sm border-b border-r bg-white dark:bg-gray-800 align-middle">
+                      <td className="h-16 w-36 px-3 text-center text-sm border-b border-r bg-card align-middle">
                         {emp.nip}
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={3} className="h-16 text-center text-sm border-b border-r bg-white dark:bg-gray-800">
+                    <td colSpan={3} className="h-16 text-center text-sm border-b border-r bg-card">
                       Tidak ada data karyawan
                     </td>
                   </tr>
@@ -930,7 +930,7 @@ export default function ManagementPage() {
                   <tr>
                     <th
                       colSpan={getDaysInSelectedMonth().length * 2}
-                      className="h-12 bg-secondary/80 dark:bg-primary/20 px-4 text-center text-sm font-semibold border-b border-r sticky top-0"
+                      className="h-12 bg-secondary px-4 text-center text-sm font-semibold text-foreground border-b border-r sticky top-0"
                     >
                       Absensi - {getSelectedMonthName()} {selectedYear}
                     </th>
@@ -940,16 +940,15 @@ export default function ManagementPage() {
                       const dayStr = day.toString().padStart(2, "0")
                       const dateKey = `${selectedYear}-${selectedMonth}-${dayStr}`
                       const isHolidayDay = isHoliday(dateKey)
-                      const isLastDay = index === getDaysInSelectedMonth().length - 1
 
                       return (
                         <th
                           key={day}
                           colSpan={2}
-                          className={`h-10 w-24 px-2 text-center text-xs font-medium border-b border-r relative group cursor-pointer transition-colors ${
+                          className={`h-10 w-24 px-2 text-center text-xs font-medium text-foreground border-b border-r relative group cursor-pointer transition-colors ${
                             isHolidayDay
-                              ? "bg-orange-200 dark:bg-orange-900/50 hover:bg-orange-300 dark:hover:bg-orange-900/70"
-                              : "bg-secondary dark:bg-primary/10 hover:bg-secondary/80 dark:hover:bg-primary/20"
+                              ? "bg-orange-200 dark:bg-orange-950 hover:bg-orange-300 dark:hover:bg-orange-900"
+                              : "bg-secondary hover:bg-secondary/80"
                           }`}
                           onClick={() => handleHolidayToggle(dateKey)}
                           title={
@@ -975,10 +974,10 @@ export default function ManagementPage() {
                   <tr className="sticky top-22">
                     {getDaysInSelectedMonth().map((day, dayIndex) => (
                       <React.Fragment key={day}>
-                        <th className="h-8 w-12 px-1 bg-secondary dark:bg-primary/10 text-center text-xs font-medium text-gray-700 dark:text-gray-300 border-b border-r">
+                        <th className="h-8 w-12 px-1 bg-secondary text-center text-xs font-semibold text-foreground border-b border-r">
                           Masuk
                         </th>
-                        <th className="h-8 w-12 px-1 bg-blue-50 dark:bg-blue-900/20 text-center text-xs font-medium text-gray-700 dark:text-gray-300 border-b border-r">
+                        <th className="h-8 w-12 px-1 bg-card text-center text-xs font-semibold text-foreground border-b border-r">
                           Pulang
                         </th>
                       </React.Fragment>
@@ -994,7 +993,6 @@ export default function ManagementPage() {
                           const dateKey = `${selectedYear}-${selectedMonth}-${dayStr}`
                           const checkinStatus = emp.attendance?.[dateKey] || "tidak"
                           const checkoutStatus = emp.checkoutAttendance?.[dateKey] || "kosong"
-                          const isLastDay = dayIndex === getDaysInSelectedMonth().length - 1
 
                           return (
                             <React.Fragment key={day}>
@@ -1034,7 +1032,7 @@ export default function ManagementPage() {
                     <tr>
                       <td
                         colSpan={getDaysInSelectedMonth().length * 2}
-                        className="h-16 text-center text-sm border-b border-r bg-white dark:bg-gray-800"
+                        className="h-16 text-center text-sm border-b border-r bg-card"
                       >
                         Tidak ada data absensi
                       </td>
@@ -1051,24 +1049,24 @@ export default function ManagementPage() {
             <table className="border-collapse">
               <thead>
                 <tr>
-                  <th className="h-12 w-24 bg-secondary/80 dark:bg-primary/20 px-4 text-center text-sm font-semibold text-gray-900 dark:text-white border-b">
+                  <th className="h-12 w-24 bg-secondary px-4 text-center text-sm font-semibold text-foreground border-b">
                     Total
                   </th>
                 </tr>
                 <tr>
-                  <th className="h-10 w-24 bg-secondary dark:bg-primary/10 text-center text-xs font-medium text-gray-700 dark:text-gray-300 border-b border-l">
+                  <th className="h-10 w-24 bg-secondary text-center text-xs font-medium text-foreground border-b border-l">
                     H(T)/Total
                   </th>
                 </tr>
                 <tr>
-                  <th className="h-8 w-24 bg-secondary dark:bg-primary/10 border-b border-l"></th>
+                  <th className="h-8 w-24 bg-secondary border-b border-l"></th>
                 </tr>
               </thead>
               <tbody>
                 {filteredEmployees.length > 0 ? (
                   filteredEmployees.map((emp) => (
                     <tr key={emp.id} className="hover:bg-secondary dark:hover:bg-primary/5 transition-colors">
-                      <td className="h-16 w-24 px-3 text-center border-b border-l bg-white dark:bg-gray-800 align-middle">
+                      <td className="h-16 w-24 px-3 text-center border-b border-l bg-card align-middle">
                         <div className="flex items-center justify-center font-mono text-sm text-gray-700 dark:text-gray-200">
                           {emp.summary}
                         </div>
@@ -1077,7 +1075,7 @@ export default function ManagementPage() {
                   ))
                 ) : (
                   <tr>
-                    <td className="h-16 w-24 px-3 text-center border-b border-l bg-white dark:bg-gray-800">-</td>
+                    <td className="h-16 w-24 px-3 text-center border-b border-l bg-card">-</td>
                   </tr>
                 )}
               </tbody>
@@ -1087,24 +1085,24 @@ export default function ManagementPage() {
             <table className="border-collapse">
               <thead>
                 <tr>
-                  <th className="h-12 w-24 bg-secondary/80 dark:bg-primary/20 px-4 text-center text-sm font-semibold text-gray-900 dark:text-white border-b">
+                  <th className="h-12 w-24 bg-secondary px-4 text-center text-sm font-semibold text-foreground border-b">
                     Aksi
                   </th>
                 </tr>
                 <tr>
-                  <th className="h-10 w-24 bg-secondary dark:bg-primary/10 text-center text-xs font-medium text-gray-700 dark:text-gray-300 border-b border-l">
+                  <th className="h-10 w-24 bg-secondary text-center text-xs font-medium text-foreground border-b border-l">
                     &nbsp;
                   </th>
                 </tr>
                 <tr>
-                  <th className="h-8 w-24 bg-secondary dark:bg-primary/10 border-b border-l"></th>
+                  <th className="h-8 w-24 bg-secondary border-b border-l"></th>
                 </tr>
               </thead>
               <tbody>
                 {filteredEmployees.length > 0 ? (
                   filteredEmployees.map((emp) => (
                     <tr key={emp.id} className="hover:bg-secondary dark:hover:bg-primary/5 transition-colors">
-                      <td className="h-16 w-24 px-3 text-center border-b border-l bg-white dark:bg-gray-800 align-middle">
+                      <td className="h-16 w-24 px-3 text-center border-b border-l bg-card align-middle">
                         <div className="flex items-center justify-center gap-1">
                           <button
                             onClick={() => startEditEmployee(emp)}
@@ -1126,7 +1124,7 @@ export default function ManagementPage() {
                   ))
                 ) : (
                   <tr>
-                    <td className="h-16 w-24 px-3 text-center border-b border-l bg-white dark:bg-gray-800">-</td>
+                    <td className="h-16 w-24 px-3 text-center border-b border-l bg-card">-</td>
                   </tr>
                 )}
               </tbody>

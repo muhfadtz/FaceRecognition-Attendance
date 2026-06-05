@@ -76,7 +76,7 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(({ className, va
             <div
                 ref={ref}
                 className={cn(
-                    "fixed inset-y-0 left-0 z-50 w-64 transform bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0",
+                    "fixed inset-y-0 left-0 z-50 w-64 transform bg-card border-r border-border transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0",
                     isOpen ? "translate-x-0" : "-translate-x-full",
                     variant === "inset" && "lg:rounded-lg lg:border lg:m-2",
                     className,
@@ -95,7 +95,7 @@ export const SidebarHeader = forwardRef<HTMLDivElement, SidebarHeaderProps>(({ c
         <div
             ref={ref}
             className={cn(
-                "flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-gray-700",
+                "flex items-center justify-between h-16 px-4 border-b border-border",
                 className,
             )}
             {...props}
@@ -118,7 +118,7 @@ export const SidebarFooter = forwardRef<HTMLDivElement, SidebarFooterProps>(({ c
         <div
             ref={ref}
             className={cn(
-                "flex items-center justify-between h-16 px-4 border-t border-gray-200 dark:border-gray-700",
+                "flex items-center justify-between h-16 px-4 border-t border-border",
                 className,
             )}
             {...props}
@@ -180,10 +180,10 @@ export const SidebarMenuButton = forwardRef<HTMLButtonElement, SidebarMenuButton
             <button
                 ref={ref}
                 className={cn(
-                    "flex items-center w-full px-3 py-2 text-sm font-medium rounded-md transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+                    "flex items-center w-full px-3 py-2 text-sm font-medium rounded-md transition-colors hover:bg-secondary dark:hover:bg-secondary/50 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
                     isActive
-                        ? "bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-900 dark:hover:bg-blue-800"
-                        : "text-gray-900 dark:text-gray-100",
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                        : "text-foreground",
                     className,
                 )}
                 {...props}
@@ -196,6 +196,6 @@ SidebarMenuButton.displayName = "SidebarMenuButton"
 interface SidebarSeparatorProps extends React.HTMLAttributes<HTMLDivElement> { }
 
 export const SidebarSeparator = forwardRef<HTMLDivElement, SidebarSeparatorProps>(({ className, ...props }, ref) => {
-    return <div ref={ref} className={cn("h-px bg-gray-200 dark:bg-gray-700 my-2 mx-2", className)} {...props} />
+    return <div ref={ref} className={cn("h-px bg-border my-2 mx-2", className)} {...props} />
 })
 SidebarSeparator.displayName = "SidebarSeparator"

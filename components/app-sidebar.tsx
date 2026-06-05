@@ -114,7 +114,7 @@ export function AppSidebar() {
                     <SidebarMenuItem>
                         <SidebarMenuButton
                             onClick={() => setShowLogoutModal(true)}
-                            className="w-full justify-start gap-3 text-red-600 hover:text-red-700 hover:bg-red-50 transition-all duration-200 font-semibold"
+                            className="w-full justify-start gap-3 text-red-600 hover:text-red-500 hover:bg-red-500/10 dark:hover:bg-red-500/20 transition-all duration-200 font-semibold"
                         >
                             <LogOut className="h-4 w-4 flex-shrink-0" />
                             <span className="truncate">Sign Out</span>
