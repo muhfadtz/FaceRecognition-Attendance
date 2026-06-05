@@ -74,7 +74,7 @@ export async function GET(req: Request) {
       if (!isFirstPage) doc.addPage()
       isFirstPage = false
 
-      doc.font("bold").fontSize(18).text("REKAP ABSENSI AL ITTIHADIYAH", { align: "center" })
+      doc.font("bold").fontSize(18).text("STAFFORA ATTENDANCE REPORT", { align: "center" })
       doc.moveDown(0.2)
       doc.font("regular").fontSize(12).text(`Periode: ${dayjs(start).format("MMMM YYYY")}`, { align: "center" })
       doc.font("regular").fontSize(12).text(`Role: ${role.toUpperCase()}`, { align: "center" })

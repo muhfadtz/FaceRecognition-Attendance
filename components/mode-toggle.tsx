@@ -16,34 +16,34 @@ export function ModeToggle() {
             variant="outline"
             size="icon"
             aria-label="Toggle theme"
-            className="h-12 w-12 rounded-full bg-white dark:bg-gray-800 border-2 border-emerald-200 dark:border-gray-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 hover:border-emerald-300 dark:hover:border-gray-500"
+            className="h-12 w-12 rounded-full bg-card border-2 border-border shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 hover:border-primary"
           >
-            <Sun className="h-[1.4rem] w-[1.4rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-emerald-600 dark:text-emerald-400" />
-            <Moon className="absolute h-[1.4rem] w-[1.4rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-emerald-600 dark:text-emerald-400" />
+            <Sun className="h-[1.4rem] w-[1.4rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-primary" />
+            <Moon className="absolute h-[1.4rem] w-[1.4rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-primary" />
             <span className="sr-only">Toggle theme</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"
-          className="mb-2 bg-white dark:bg-gray-800 border border-emerald-200 dark:border-gray-600 shadow-xl"
+          className="mb-2 bg-card border border-border shadow-xl"
         >
           <DropdownMenuItem
             onClick={() => setTheme("light")}
-            className="hover:bg-emerald-50 dark:hover:bg-emerald-900/20 cursor-pointer"
+            className="hover:bg-secondary cursor-pointer font-medium text-sm"
           >
             <Sun className="mr-2 h-4 w-4" />
             Light
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => setTheme("dark")}
-            className="hover:bg-emerald-50 dark:hover:bg-emerald-900/20 cursor-pointer"
+            className="hover:bg-secondary cursor-pointer font-medium text-sm"
           >
             <Moon className="mr-2 h-4 w-4" />
             Dark
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => setTheme("system")}
-            className="hover:bg-emerald-50 dark:hover:bg-emerald-900/20 cursor-pointer"
+            className="hover:bg-secondary cursor-pointer font-medium text-sm"
           >
             <Monitor className="mr-2 h-4 w-4" />
             System

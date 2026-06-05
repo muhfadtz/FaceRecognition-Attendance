@@ -23,10 +23,11 @@ DB_HOST = os.environ.get("DB_HOST", "HOST")
 DB_NAME = os.environ.get("DB_NAME", "DATABASE")
 DB_USER = os.environ.get("DB_USER", "USERNAME")
 DB_PASS = os.environ.get("DB_PASS", "PASSWORD")
+DB_PORT = os.environ.get("DB_PORT", "6543")
 
 def get_db_connection():
     try:
-        conn = psycopg2.connect(host=DB_HOST, database=DB_NAME, user=DB_USER, password=DB_PASS)
+        conn = psycopg2.connect(host=DB_HOST, database=DB_NAME, user=DB_USER, password=DB_PASS, port=DB_PORT)
         return conn
     except psycopg2.Error as e:
         app.logger.error(f"Flask: Error connecting to PostgreSQL: {e}")

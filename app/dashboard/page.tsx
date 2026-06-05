@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { Users, UserCheck, UserX, Clock, Calendar, TrendingUp, Activity, Loader2, AlertCircle } from "lucide-react"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import { Skeleton } from "@/components/ui/skeleton"
 
 function DashboardContent() {
   const [data, setData] = useState<{
@@ -76,10 +77,54 @@ function DashboardContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-emerald-600 mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400 text-lg">Memuat data dashboard...</p>
+      <div className="flex flex-1 flex-col gap-6 p-6 bg-background min-h-screen">
+        {/* Header Skeleton */}
+        <div className="flex items-center gap-4 border-b border-border pb-6">
+          <div className="flex flex-col gap-2 flex-1">
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="h-4 w-32" />
+          </div>
+          <Skeleton className="h-12 w-36 rounded-xl" />
+        </div>
+
+        {/* Stats Cards Skeleton */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="bg-card rounded-lg p-6 border border-border shadow-sm flex flex-col gap-4">
+              <div className="flex justify-between items-center">
+                <Skeleton className="h-10 w-10 rounded-md" />
+                <Skeleton className="h-5 w-10 rounded-full" />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Skeleton className="h-3 w-24" />
+                <Skeleton className="h-8 w-16" />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Activities Skeleton */}
+        <div className="max-w-4xl mx-auto w-full mt-4">
+          <div className="bg-card rounded-lg border border-border p-6 lg:p-8 shadow-sm flex flex-col gap-6">
+            <div className="flex items-center gap-3 border-b border-border pb-4">
+              <Skeleton className="h-5 w-5 rounded-full" />
+              <Skeleton className="h-6 w-36" />
+            </div>
+            <div className="space-y-3">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="flex justify-between items-center p-4 bg-background/50 border border-border/60 rounded-lg">
+                  <div className="flex flex-col gap-2 flex-1">
+                    <Skeleton className="h-4 w-48" />
+                    <Skeleton className="h-3 w-32" />
+                  </div>
+                  <div className="flex flex-col gap-2 items-end">
+                    <Skeleton className="h-4 w-12" />
+                    <Skeleton className="h-5 w-20 rounded-full" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -87,17 +132,17 @@ function DashboardContent() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto p-6">
-          <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Terjadi Kesalahan</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">{error}</p>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-6 bg-card border border-border rounded-2xl shadow-sm">
+          <AlertCircle className="h-16 w-16 text-destructive mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-foreground mb-2">Terjadi Kesalahan</h2>
+          <p className="text-muted-foreground mb-6">{error}</p>
           <button
             onClick={() => {
               setIsLoading(true)
               fetchDashboardData()
             }}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg transition-colors"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-lg transition-colors font-medium"
           >
             Coba Lagi
           </button>
@@ -108,9 +153,9 @@ function DashboardContent() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600 dark:text-gray-400 text-lg">Tidak ada data tersedia</p>
+          <p className="text-muted-foreground text-lg">Tidak ada data tersedia</p>
         </div>
       </div>
     )
@@ -123,18 +168,18 @@ function DashboardContent() {
       title: "Total Karyawan",
       value: data.totalKaryawan,
       icon: Users,
-      color: "from-blue-500 to-blue-600",
-      bgColor: "bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900",
-      textColor: "text-blue-600",
+      color: "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40",
+      bgColor: "bg-card",
+      textColor: "text-foreground",
       changeType: "increase",
     },
     {
       title: "Hadir Hari Ini",
       value: data.hadir,
       icon: UserCheck,
-      color: "from-green-500 to-green-600",
-      bgColor: "bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900",
-      textColor: "text-green-600",
+      color: "text-primary bg-primary/10",
+      bgColor: "bg-card",
+      textColor: "text-foreground",
       change: `${attendancePercentage}%`,
       changeType: "increase",
     },
@@ -142,9 +187,9 @@ function DashboardContent() {
       title: "Tidak Masuk",
       value: data.absen,
       icon: UserX,
-      color: "from-red-500 to-red-600",
-      bgColor: "bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950 dark:to-red-900",
-      textColor: "text-red-600",
+      color: "text-destructive bg-destructive/10",
+      bgColor: "bg-card",
+      textColor: "text-foreground",
       changeType: "decrease",
       change: `${100 - attendancePercentage}%`,
     },
@@ -152,9 +197,9 @@ function DashboardContent() {
       title: "Terlambat",
       value: data.telat,
       icon: Clock,
-      color: "from-orange-500 to-orange-600",
-      bgColor: "bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900",
-      textColor: "text-orange-600",
+      color: "text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40",
+      bgColor: "bg-card",
+      textColor: "text-foreground",
       change: data.totalKaryawan > 0 ? `${Math.round((data.telat / data.totalKaryawan) * 100)}%` : "0%",
       changeType: "increase",
     },
@@ -162,9 +207,9 @@ function DashboardContent() {
       title: "Sudah Pulang",
       value: data.pulang,
       icon: UserCheck,
-      color: "from-purple-500 to-purple-600",
-      bgColor: "bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900",
-      textColor: "text-purple-600",
+      color: "text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/40",
+      bgColor: "bg-card",
+      textColor: "text-foreground",
       change: data.hadir > 0 ? `${Math.round((data.pulang / data.hadir) * 100)}%` : "0%",
       changeType: "increase",
     },
@@ -173,17 +218,17 @@ function DashboardContent() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "ontime":
-        return "text-green-700 bg-green-100 dark:bg-green-900 dark:text-green-300"
+        return "text-green-700 bg-green-50 dark:bg-green-950/40 dark:text-green-300 border border-green-200 dark:border-green-900"
       case "late":
-        return "text-orange-700 bg-orange-100 dark:bg-orange-900 dark:text-orange-300"
+        return "text-amber-700 bg-amber-50 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200 dark:border-amber-900"
       case "permission":
-        return "text-blue-700 bg-blue-100 dark:bg-blue-900 dark:text-blue-300"
+        return "text-blue-700 bg-blue-50 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200 dark:border-blue-900"
       case "sick":
-        return "text-purple-700 bg-purple-100 dark:bg-purple-900 dark:text-purple-300"
+        return "text-purple-700 bg-purple-50 dark:bg-purple-950/40 dark:text-purple-300 border border-purple-200 dark:border-purple-900"
       case "checkout":
-        return "text-purple-700 bg-purple-100 dark:bg-purple-900 dark:text-purple-300"
+        return "text-purple-700 bg-purple-50 dark:bg-purple-950/40 dark:text-purple-300 border border-purple-200 dark:border-purple-900"
       default:
-        return "text-gray-700 bg-gray-100 dark:bg-gray-900 dark:text-gray-300"
+        return "text-muted-foreground bg-secondary dark:bg-gray-900 border border-border"
     }
   }
 
@@ -205,25 +250,25 @@ function DashboardContent() {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 pt-0 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-gray-900 dark:to-gray-800 min-h-screen">
+    <div className="flex flex-1 flex-col gap-6 p-6 bg-background min-h-screen">
       {/* Header */}
-      <div className="flex items-center gap-4 border-b border-emerald-100 dark:border-gray-700 pb-4">
-        <SidebarTrigger className="-ml-1 lg:hidden" />
+      <div className="flex items-center gap-4 border-b border-border pb-6">
+        <SidebarTrigger className="-ml-1 lg:hidden text-foreground" />
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 flex-1">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">Dashboard </h1>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-2">
-              <p className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                <span className="text-sm">{data.date}</span>
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">Dashboard</h1>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-1">
+              <p className="text-muted-foreground flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium">{data.date}</span>
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="text-right bg-white dark:bg-gray-700 px-4 py-3 rounded-xl shadow-sm border border-emerald-100 dark:border-gray-600">
-              <p className="text-sm text-gray-600 dark:text-gray-400">Waktu Sekarang</p>
-              <p className="text-lg lg:text-xl font-bold text-gray-900 dark:text-white font-mono">
+            <div className="text-right bg-card px-4 py-2.5 rounded-md shadow-sm border border-border">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Waktu Sekarang</p>
+              <p className="text-lg lg:text-xl font-bold text-foreground font-mono mt-0.5">
                 {currentTime.toLocaleTimeString("id-ID")}
               </p>
             </div>
@@ -232,24 +277,22 @@ function DashboardContent() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6">
         {statsCards.map((card, index) => (
           <div
             key={index}
-            className={`${card.bgColor} rounded-2xl p-4 lg:p-6 border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1`}
+            className={`${card.bgColor} rounded-md p-6 border border-border shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5`}
           >
             <div className="flex items-center justify-between mb-4">
-              <div
-                className={`w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-r ${card.color} rounded-xl flex items-center justify-center shadow-lg`}
-              >
-                <card.icon className="h-5 w-5 lg:h-6 lg:w-6 text-white" />
+              <div className={`w-10 h-10 rounded-md flex items-center justify-center ${card.color}`}>
+                <card.icon className="h-5 w-5" />
               </div>
               {card.change && (
                 <div
-                  className={`text-xs px-2 py-1 rounded-full ${
+                  className={`text-xs font-semibold px-2 py-1 rounded-full ${
                     card.changeType === "increase"
-                      ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-                      : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
+                      ? "bg-primary/10 text-primary border border-primary/20"
+                      : "bg-destructive/10 text-destructive border border-destructive/20"
                   }`}
                 >
                   {card.change}
@@ -257,44 +300,42 @@ function DashboardContent() {
               )}
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{card.title}</p>
-              <p className={`text-2xl lg:text-3xl font-bold ${card.textColor}`}>{card.value.toLocaleString()}</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">{card.title}</p>
+              <p className={`text-2xl lg:text-3xl font-bold tracking-tight ${card.textColor}`}>{card.value.toLocaleString()}</p>
             </div>
           </div>
         ))}
       </div>
 
       {/* Activities */}
-      <div className="max-w-4xl mx-auto w-full">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 lg:p-8 shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
-                <TrendingUp className="h-4 w-4 text-white" />
-              </div>
+      <div className="max-w-4xl mx-auto w-full mt-4">
+        <div className="bg-card rounded-md border border-border p-6 lg:p-8 shadow-sm">
+          <div className="flex items-center justify-between mb-6 border-b border-border pb-4">
+            <h3 className="text-lg font-bold text-foreground flex items-center gap-3">
+              <Activity className="h-5 w-5 text-primary" />
               Aktivitas Terbaru
             </h3>
           </div>
 
           {activities.length > 0 ? (
-            <div className="space-y-4 max-h-96 overflow-y-auto">
+            <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin">
               {activities.map((activity) => (
                 <div
                   key={activity.id}
-                  className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                  className="flex items-center justify-between p-4 bg-background/50 border border-border/60 rounded-md hover:bg-background/80 transition-colors"
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-900 dark:text-white text-sm truncate">
+                    <p className="font-semibold text-foreground text-sm truncate">
                       {activity.name}
-                      <span className="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">
+                      <span className="ml-2 text-xs font-normal text-muted-foreground">
                         ({activity.role})
                       </span>
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{activity.action}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{activity.action}</p>
                   </div>
                   <div className="text-right flex-shrink-0 ml-4">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">{activity.time}</p>
-                    <span className={`text-xs px-3 py-1 rounded-full font-medium ${getStatusColor(activity.status)}`}>
+                    <p className="text-sm font-semibold text-foreground mb-1 font-mono">{activity.time}</p>
+                    <span className={`text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full ${getStatusColor(activity.status)}`}>
                       {getStatusText(activity.status)}
                     </span>
                   </div>
@@ -302,9 +343,9 @@ function DashboardContent() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-8">
-              <Activity className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500 dark:text-gray-400">Belum ada aktivitas hari ini</p>
+            <div className="text-center py-12">
+              <Activity className="h-12 w-12 text-muted-foreground/40 mx-auto mb-4" />
+              <p className="text-muted-foreground">Belum ada aktivitas hari ini</p>
             </div>
           )}
         </div>

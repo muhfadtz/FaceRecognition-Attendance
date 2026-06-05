@@ -4,6 +4,7 @@ import type React from "react"
 import { useState, useRef, useCallback } from "react"
 import { Camera, Save, X, Loader2, RotateCcw, User, Mail, Lock, BadgeIcon, CheckCircle, UserPlus, Users } from "lucide-react"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface FormData {
     nama: string
@@ -248,25 +249,25 @@ export default function RegistrationPage() {
 
     const getStatusColor = (status: string) => {
         return status === "Teacher" 
-            ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800"
-            : "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800"
+            ? "bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900"
+            : "bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-900"
     }
 
     return (
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-gray-900 dark:to-gray-800 min-h-screen">
+        <div className="flex flex-1 flex-col gap-6 p-6 bg-background min-h-screen">
             {/* Header with Sidebar Trigger */}
-            <div className="flex items-center gap-4 border-b border-emerald-100 dark:border-gray-700 pb-4">
-                <SidebarTrigger className="-ml-1 lg:hidden" />
+            <div className="flex items-center gap-4 border-b border-border pb-6">
+                <SidebarTrigger className="-ml-1 lg:hidden text-foreground" />
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 flex-1">
                     <div>
-                        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">Pendaftaran Karyawan</h1>
-                        <p className="text-gray-600 dark:text-gray-400">Tambah karyawan baru ke sistem</p>
+                        <h1 className="text-3xl font-bold tracking-tight text-foreground">Pendaftaran Karyawan</h1>
+                        <p className="text-muted-foreground">Tambah karyawan baru ke sistem</p>
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                        <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-md border border-primary/20">
                             <UserPlus className="h-5 w-5" />
-                            <span className="font-medium">Langkah {currentStep} dari 2</span>
+                            <span className="font-medium text-sm">Langkah {currentStep} dari 2</span>
                         </div>
                     </div>
                 </div>
@@ -278,83 +279,84 @@ export default function RegistrationPage() {
                 <div className="flex items-center mb-10">
                     <div className="flex flex-col items-center">
                         <div
-                            className={`w-12 h-12 rounded-full flex items-center justify-center text-base font-medium ${currentStep >= 1 ? "bg-emerald-600 text-white" : "bg-gray-200 text-gray-500"
-                                }`}
+                            className={`w-12 h-12 rounded-full flex items-center justify-center text-base font-semibold border ${
+                                currentStep >= 1 ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-muted-foreground border-border"
+                            }`}
                         >
                             1
                         </div>
-                        <span className={`mt-2 text-sm font-medium ${currentStep >= 1 ? "text-emerald-600" : "text-gray-500"}`}>
+                        <span className={`mt-2 text-xs font-semibold uppercase tracking-wider ${currentStep >= 1 ? "text-primary" : "text-muted-foreground"}`}>
                             Data Karyawan
                         </span>
                     </div>
 
                     <div className="flex-1 mx-4">
-                        <div className={`h-1.5 rounded-full ${currentStep >= 2 ? "bg-emerald-600" : "bg-gray-300"}`}></div>
+                        <div className={`h-1.5 rounded-full ${currentStep >= 2 ? "bg-primary" : "bg-secondary"}`}></div>
                     </div>
 
                     <div className="flex flex-col items-center">
                         <div
-                            className={`w-12 h-12 rounded-full flex items-center justify-center text-base font-medium ${currentStep >= 2 ? "bg-emerald-600 text-white" : "bg-gray-200 text-gray-500"
-                                }`}
+                            className={`w-12 h-12 rounded-full flex items-center justify-center text-base font-semibold border ${
+                                currentStep >= 2 ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-muted-foreground border-border"
+                            }`}
                         >
                             2
                         </div>
-                        <span className={`mt-2 text-sm font-medium ${currentStep >= 2 ? "text-emerald-600" : "text-gray-500"}`}>
+                        <span className={`mt-2 text-xs font-semibold uppercase tracking-wider ${currentStep >= 2 ? "text-primary" : "text-muted-foreground"}`}>
                             Foto Wajah
                         </span>
                     </div>
                 </div>
 
                 {/* Form Content */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl border border-emerald-100 dark:border-gray-700 shadow-lg overflow-hidden">
+                <div className="bg-card rounded-md border border-border shadow-sm overflow-hidden">
                     {currentStep === 1 && (
                         <div className="p-8 lg:p-10">
-                            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-8">Informasi Karyawan</h2>
+                            <h2 className="text-xl font-bold text-foreground mb-8">Informasi Karyawan</h2>
 
                             <div className="space-y-6">
                                 <div className="space-y-2">
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Lengkap</label>
+                                    <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nama Lengkap</label>
                                     <div className="relative">
-                                        <User className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                                        <User className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground/60" />
                                         <input
                                             type="text"
                                             name="nama"
                                             value={formData.nama || ""}
                                             onChange={handleInputChange}
-                                            className="w-full pl-12 pr-4 py-3.5 border border-emerald-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
+                                            className="w-full pl-12 pr-4 py-3 border border-border rounded-md bg-background text-foreground placeholder-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                                             placeholder="Masukkan nama lengkap"
                                             required
                                         />
                                         {formData.nama && (
-                                            <CheckCircle className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-green-500" />
+                                            <CheckCircle className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-primary" />
                                         )}
                                     </div>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                         NIP (Nomor Induk Pegawai)
                                     </label>
                                     <div className="relative">
-                                        <BadgeIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                                        <BadgeIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground/60" />
                                         <input
                                             type="text"
                                             name="nip"
                                             value={formData.nip || ""}
                                             onChange={handleInputChange}
-                                            className={`w-full pl-12 pr-4 py-3.5 border rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 ${!isNipValid && formData.nip
-                                                    ? "border-red-500 ring-red-200"
-                                                    : "border-emerald-200 dark:border-gray-600"
-                                                }`}
+                                            className={`w-full pl-12 pr-4 py-3 border rounded-md bg-background text-foreground placeholder-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 ${
+                                                !isNipValid && formData.nip ? "border-destructive ring-destructive/20" : "border-border"
+                                            }`}
                                             placeholder="Masukkan NIP (5-12 digit)"
                                             required
                                         />
                                         {isNipValid && formData.nip && (
-                                            <CheckCircle className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-green-500" />
+                                            <CheckCircle className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-primary" />
                                         )}
                                     </div>
                                     {!isNipValid && formData.nip && (
-                                        <p className="text-xs text-red-600 dark:text-red-400 flex items-center mt-1">
+                                        <p className="text-xs text-destructive flex items-center mt-1">
                                             <X className="h-4 w-4 mr-1" />
                                             Format NIP tidak valid. Gunakan 5-12 digit angka.
                                         </p>
@@ -362,60 +364,57 @@ export default function RegistrationPage() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+                                    <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Email</label>
                                     <div className="relative">
-                                        <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                                        <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground/60" />
                                         <input
                                             type="email"
                                             name="email"
                                             value={formData.email || ""}
                                             onChange={handleInputChange}
-                                            className="w-full pl-12 pr-4 py-3.5 border border-emerald-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
+                                            className="w-full pl-12 pr-4 py-3 border border-border rounded-md bg-background text-foreground placeholder-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                                             placeholder="Masukkan email"
                                             required
                                         />
                                         {formData.email && (
-                                            <CheckCircle className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-green-500" />
+                                            <CheckCircle className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-primary" />
                                         )}
                                     </div>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+                                    <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Password</label>
                                     <div className="relative">
-                                        <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                                        <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground/60" />
                                         <input
                                             type="password"
                                             name="password"
                                             value={formData.password || ""}
                                             onChange={handleInputChange}
-                                            className="w-full pl-12 pr-4 py-3.5 border border-emerald-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
+                                            className="w-full pl-12 pr-4 py-3 border border-border rounded-md bg-background text-foreground placeholder-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                                             placeholder="Masukkan password (min. 6 karakter)"
                                             required
                                         />
                                         {formData.password && formData.password.length >= 6 && (
-                                            <CheckCircle className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-green-500" />
+                                            <CheckCircle className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-primary" />
                                         )}
                                     </div>
                                     {formData.password && formData.password.length < 6 && (
                                         <p className="text-xs text-amber-600 dark:text-amber-400 flex items-center mt-1">
-                                            <span className="inline-block w-4 h-4 mr-1 rounded-full border border-amber-600 dark:border-amber-400 text-center text-amber-600 dark:text-amber-400 font-bold">
-                                                !
-                                            </span>
                                             Password minimal 6 karakter
                                         </p>
                                     )}
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                                    <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Status</label>
                                     <div className="relative">
-                                        <Users className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                                        <Users className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground/60" />
                                         <select
                                             name="status"
                                             value={formData.status || "Staff"}
                                             onChange={handleInputChange}
-                                            className="w-full pl-12 pr-4 py-3.5 border border-emerald-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 appearance-none"
+                                            className="w-full pl-12 pr-4 py-3 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 appearance-none"
                                             required
                                         >
                                             <option value="Staff">Staff</option>
@@ -423,19 +422,19 @@ export default function RegistrationPage() {
                                         </select>
                                         {formData.status && (
                                             <div className="absolute right-12 top-1/2 transform -translate-y-1/2">
-                                                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(formData.status)}`}>
+                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${getStatusColor(formData.status)}`}>
                                                     <span className="mr-1">{getStatusIcon(formData.status)}</span>
                                                     {formData.status}
                                                 </span>
                                             </div>
                                         )}
                                         <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg className="w-4 h-4 text-muted-foreground/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                             </svg>
                                         </div>
                                     </div>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    <p className="text-xs text-muted-foreground mt-1">
                                         Pilih status karyawan: Staff untuk pegawai administrasi, Teacher untuk tenaga pengajar
                                     </p>
                                 </div>
@@ -443,10 +442,11 @@ export default function RegistrationPage() {
 
                             {submitMessage && currentStep === 1 && (
                                 <div
-                                    className={`mt-8 p-4 rounded-xl text-sm ${submitMessage.includes("berhasil")
-                                            ? "bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800"
-                                            : "bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800"
-                                        }`}
+                                    className={`mt-8 p-4 rounded-md text-sm border ${
+                                        submitMessage.includes("berhasil")
+                                            ? "bg-primary/10 text-primary border-primary/20"
+                                            : "bg-destructive/10 text-destructive border-destructive/20"
+                                    }`}
                                 >
                                     {submitMessage}
                                 </div>
@@ -456,7 +456,7 @@ export default function RegistrationPage() {
                                 <button
                                     onClick={handleNextStep}
                                     disabled={!isFormValid()}
-                                    className="px-8 py-3.5 bg-emerald-600 text-white text-sm font-medium rounded-xl hover:bg-emerald-700 transition-colors shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 disabled:shadow-none"
+                                    className="px-8 py-3 bg-primary text-primary-foreground text-sm font-semibold rounded-md hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-secondary disabled:text-muted-foreground disabled:shadow-none"
                                 >
                                     Selanjutnya
                                 </button>
@@ -466,31 +466,31 @@ export default function RegistrationPage() {
 
                     {currentStep === 2 && (
                         <div className="p-8 lg:p-10">
-                            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-8">Pengambilan Foto Wajah</h2>
+                            <h2 className="text-xl font-bold text-foreground mb-8">Pengambilan Foto Wajah</h2>
 
                             <div className="space-y-8">
                                 {/* Employee Info Summary */}
-                                <div className="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-xl p-5">
-                                    <h3 className="font-medium text-emerald-900 dark:text-emerald-300 mb-3 flex items-center">
-                                        <User className="h-5 w-5 mr-2" />
+                                <div className="bg-background border border-border rounded-md p-5">
+                                    <h3 className="font-bold text-foreground text-sm uppercase tracking-wider mb-4 flex items-center">
+                                        <User className="h-4 w-4 mr-2 text-primary" />
                                         Ringkasan Data Karyawan
                                     </h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                                         <div>
-                                            <span className="text-emerald-700 dark:text-emerald-300 font-medium">Nama:</span>
-                                            <span className="ml-2 text-emerald-800 dark:text-emerald-200">{formData.nama}</span>
+                                            <span className="text-muted-foreground font-medium">Nama:</span>
+                                            <span className="ml-2 text-foreground font-semibold">{formData.nama}</span>
                                         </div>
                                         <div>
-                                            <span className="text-emerald-700 dark:text-emerald-300 font-medium">NIP:</span>
-                                            <span className="ml-2 text-emerald-800 dark:text-emerald-200">{formData.nip}</span>
+                                            <span className="text-muted-foreground font-medium">NIP:</span>
+                                            <span className="ml-2 text-foreground font-mono font-semibold">{formData.nip}</span>
                                         </div>
                                         <div>
-                                            <span className="text-emerald-700 dark:text-emerald-300 font-medium">Email:</span>
-                                            <span className="ml-2 text-emerald-800 dark:text-emerald-200">{formData.email}</span>
+                                            <span className="text-muted-foreground font-medium">Email:</span>
+                                            <span className="ml-2 text-foreground font-semibold">{formData.email}</span>
                                         </div>
                                         <div className="flex items-center">
-                                            <span className="text-emerald-700 dark:text-emerald-300 font-medium">Status:</span>
-                                            <span className={`ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(formData.status)}`}>
+                                            <span className="text-muted-foreground font-medium">Status:</span>
+                                            <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${getStatusColor(formData.status)}`}>
                                                 <span className="mr-1">{getStatusIcon(formData.status)}</span>
                                                 {formData.status}
                                             </span>
@@ -499,40 +499,30 @@ export default function RegistrationPage() {
                                 </div>
 
                                 {/* Camera Instructions */}
-                                <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-xl p-5">
-                                    <h3 className="font-medium text-blue-900 dark:text-blue-300 mb-3 flex items-center">
-                                        <Camera className="h-5 w-5 mr-2" />
+                                <div className="bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40 rounded-md p-5">
+                                    <h3 className="font-bold text-blue-900 dark:text-blue-300 text-sm uppercase tracking-wider mb-4 flex items-center">
+                                        <Camera className="h-4 w-4 mr-2" />
                                         Panduan Pengambilan Foto
                                     </h3>
-                                    <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-2 pl-2">
+                                    <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-2.5 pl-2">
                                         <li className="flex items-start">
-                                            <span className="inline-block w-4 h-4 mr-2 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center mt-0.5">
-                                                •
-                                            </span>
+                                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400 mt-1.5 mr-2" />
                                             Pastikan wajah terlihat jelas dan tidak tertutup
                                         </li>
                                         <li className="flex items-start">
-                                            <span className="inline-block w-4 h-4 mr-2 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center mt-0.5">
-                                                •
-                                            </span>
+                                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400 mt-1.5 mr-2" />
                                             Posisikan wajah di tengah frame
                                         </li>
                                         <li className="flex items-start">
-                                            <span className="inline-block w-4 h-4 mr-2 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center mt-0.5">
-                                                •
-                                            </span>
+                                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400 mt-1.5 mr-2" />
                                             Pastikan pencahayaan cukup terang
                                         </li>
                                         <li className="flex items-start">
-                                            <span className="inline-block w-4 h-4 mr-2 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center mt-0.5">
-                                                •
-                                            </span>
+                                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400 mt-1.5 mr-2" />
                                             Hindari bayangan pada wajah
                                         </li>
                                         <li className="flex items-start">
-                                            <span className="inline-block w-4 h-4 mr-2 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center mt-0.5">
-                                                •
-                                            </span>
+                                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400 mt-1.5 mr-2" />
                                             Lepas kacamata atau masker jika memungkinkan
                                         </li>
                                     </ul>
@@ -546,17 +536,18 @@ export default function RegistrationPage() {
                                                 ref={videoRef}
                                                 autoPlay
                                                 playsInline
-                                                className={`w-96 h-72 bg-gray-100 dark:bg-gray-800 rounded-xl border-2 border-dashed border-emerald-300 dark:border-gray-600 shadow-inner ${!isCameraActive ? "hidden" : ""
-                                                    }`}
+                                                className={`w-96 h-72 bg-secondary rounded-md border-2 border-dashed border-border shadow-inner ${
+                                                    !isCameraActive ? "hidden" : ""
+                                                }`}
                                             />
                                             {!isCameraActive && (
-                                                <div className="w-96 h-72 bg-gray-100 dark:bg-gray-800 rounded-xl border-2 border-dashed border-emerald-300 dark:border-gray-600 flex items-center justify-center shadow-inner">
+                                                <div className="w-96 h-72 bg-secondary rounded-md border-2 border-dashed border-border flex items-center justify-center shadow-inner">
                                                     <div className="text-center p-6">
-                                                        <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                                                            <Camera className="h-10 w-10 text-emerald-500 dark:text-emerald-400" />
+                                                        <div className="w-20 h-20 bg-background rounded-full flex items-center justify-center mx-auto mb-4 border border-border">
+                                                            <Camera className="h-10 w-10 text-primary" />
                                                         </div>
-                                                        <p className="text-gray-600 dark:text-gray-300 font-medium mb-1">Kamera belum aktif</p>
-                                                        <p className="text-gray-500 dark:text-gray-400 text-sm">
+                                                        <p className="text-foreground font-semibold mb-1">Kamera belum aktif</p>
+                                                        <p className="text-muted-foreground text-sm">
                                                             Klik tombol di bawah untuk mengaktifkan kamera
                                                         </p>
                                                     </div>
@@ -568,12 +559,12 @@ export default function RegistrationPage() {
 
                                     {imageSrc && (
                                         <div className="text-center">
-                                            <div className="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-xl border border-emerald-200 dark:border-emerald-700 inline-block">
-                                                <p className="text-sm text-emerald-600 dark:text-emerald-400 mb-3 font-medium">Preview Foto:</p>
+                                            <div className="bg-background p-4 rounded-md border border-border inline-block">
+                                                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Preview Foto:</p>
                                                 <img
                                                     src={imageSrc || "/placeholder.svg"}
                                                     alt="Preview"
-                                                    className="w-80 h-auto rounded-xl border border-emerald-300 dark:border-gray-600 mx-auto shadow-md"
+                                                    className="w-80 h-auto rounded-md border border-border mx-auto shadow-sm"
                                                 />
                                             </div>
                                         </div>
@@ -584,7 +575,7 @@ export default function RegistrationPage() {
                                         {!isCameraActive && !imageSrc && (
                                             <button
                                                 onClick={startCamera}
-                                                className="flex items-center px-6 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors shadow-md hover:shadow-lg"
+                                                className="flex items-center px-6 py-3 bg-primary text-primary-foreground font-semibold rounded-md hover:bg-primary/90 transition-colors shadow-sm"
                                             >
                                                 <Camera className="h-5 w-5 mr-2" />
                                                 Aktifkan Kamera
@@ -595,14 +586,14 @@ export default function RegistrationPage() {
                                             <>
                                                 <button
                                                     onClick={capturePhoto}
-                                                    className="flex items-center px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors shadow-md hover:shadow-lg"
+                                                    className="flex items-center px-6 py-3 bg-primary text-primary-foreground font-semibold rounded-md hover:bg-primary/90 transition-colors shadow-sm"
                                                 >
                                                     <Camera className="h-5 w-5 mr-2" />
                                                     Ambil Foto
                                                 </button>
                                                 <button
                                                     onClick={stopCamera}
-                                                    className="flex items-center px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors shadow-md hover:shadow-lg"
+                                                    className="flex items-center px-6 py-3 bg-destructive text-destructive-foreground font-semibold rounded-md hover:bg-destructive/90 transition-colors shadow-sm"
                                                 >
                                                     <X className="h-5 w-5 mr-2" />
                                                     Batal
@@ -613,7 +604,7 @@ export default function RegistrationPage() {
                                         {imageSrc && (
                                             <button
                                                 onClick={retakePhoto}
-                                                className="flex items-center px-6 py-3 bg-orange-600 text-white rounded-xl hover:bg-orange-700 transition-colors shadow-md hover:shadow-lg"
+                                                className="flex items-center px-6 py-3 bg-amber-600 text-white font-semibold rounded-md hover:bg-amber-700 transition-colors shadow-sm"
                                             >
                                                 <RotateCcw className="h-5 w-5 mr-2" />
                                                 Ambil Ulang
@@ -624,17 +615,18 @@ export default function RegistrationPage() {
 
                                 {submitMessage && currentStep === 2 && (
                                     <div
-                                        className={`p-4 rounded-xl text-sm ${submitMessage.includes("berhasil")
-                                                ? "bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800"
-                                                : "bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800"
-                                            }`}
+                                        className={`p-4 rounded-md text-sm border ${
+                                            submitMessage.includes("berhasil")
+                                                ? "bg-primary/10 text-primary border-primary/20"
+                                                : "bg-destructive/10 text-destructive border-destructive/20"
+                                        }`}
                                     >
                                         {submitMessage}
                                     </div>
                                 )}
 
                                 {/* Action Buttons */}
-                                <div className="flex justify-between pt-6 border-t border-emerald-200 dark:border-gray-700">
+                                <div className="flex justify-between pt-6 border-t border-border">
                                     <button
                                         onClick={() => {
                                             setCurrentStep(1)
@@ -642,14 +634,14 @@ export default function RegistrationPage() {
                                             stopCamera()
                                             setImageSrc(null)
                                         }}
-                                        className="px-6 py-3 border border-emerald-300 dark:border-gray-600 text-emerald-700 dark:text-gray-300 text-sm font-medium rounded-xl hover:bg-emerald-50 dark:hover:bg-gray-700 transition-colors"
+                                        className="px-6 py-3 border border-border text-foreground text-sm font-semibold rounded-md hover:bg-secondary transition-colors"
                                     >
                                         Kembali
                                     </button>
                                     <button
                                         onClick={handleSubmit}
                                         disabled={!imageSrc || isSubmitting}
-                                        className="flex items-center px-8 py-3 bg-emerald-600 text-white text-sm font-medium rounded-xl hover:bg-emerald-700 transition-colors shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+                                        className="flex items-center px-8 py-3 bg-primary text-primary-foreground text-sm font-semibold rounded-md hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
                                     >
                                         {isSubmitting ? (
                                             <>
