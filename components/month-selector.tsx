@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import { CustomSelect } from "@/components/ui/custom-select"
 
 interface MonthSelectorProps {
     selectedMonth: string
@@ -30,7 +31,6 @@ const MonthSelector: React.FC<MonthSelectorProps> = ({
         { value: "12", label: "Desember" },
     ]
 
-    // FUNGSI GENERATE TAHUN YANG BARU
     const generateYearOptions = () => {
         const currentYear = new Date().getFullYear()
         const startYear = 2025
@@ -44,33 +44,20 @@ const MonthSelector: React.FC<MonthSelectorProps> = ({
 
     const years = generateYearOptions()
 
-    console.log("🗓️ Generated years:", years) // Debug log
-    console.log("📅 Current year:", new Date().getFullYear())
-
     return (
         <div className="flex items-center gap-2">
-            <select
+            <CustomSelect
                 value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-                className="px-4 py-3 border border-emerald-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
-            >
-                {allMonths.map((month) => (
-                    <option key={month.value} value={month.value}>
-                        {month.label}
-                    </option>
-                ))}
-            </select>
-            <select
+                onChange={setSelectedMonth}
+                options={allMonths}
+                className="w-36"
+            />
+            <CustomSelect
                 value={selectedYear}
-                onChange={(e) => setSelectedYear(e.target.value)}
-                className="px-4 py-3 border border-emerald-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
-            >
-                {years.map((year) => (
-                    <option key={year} value={year}>
-                        {year}
-                    </option>
-                ))}
-            </select>
+                onChange={setSelectedYear}
+                options={years.map((y) => ({ value: y, label: y }))}
+                className="w-28"
+            />
         </div>
     )
 }

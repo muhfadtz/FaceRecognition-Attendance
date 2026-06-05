@@ -45,45 +45,42 @@ function HomePage() {
     <>
       <Navbar />
 
-      <main className="min-h-screen bg-paper text-ink">
+      <main className="min-h-screen bg-white text-neutral-900">
         <div className="container mx-auto px-6 py-12">
           <div className="max-w-4xl mx-auto">
-            {/* Header Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               className="text-center mb-10"
             >
-              <div className="inline-flex items-center gap-2 bg-accent/10 text-accent px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider mb-6">
-                <Activity className="h-4 w-4" />
-                <span className="mono-label !text-[10px] tracking-widest">Enterprise Attendance Platform</span>
+              <div className="inline-flex items-center gap-2 bg-neutral-100 text-neutral-600 px-3 py-1.5 rounded-lg text-[10px] font-semibold uppercase tracking-wider mb-6">
+                <Activity className="h-3.5 w-3.5" />
+                <span>Attendance Platform</span>
               </div>
 
-              <h1 className="text-4xl md:text-5xl font-extrabold text-ink mb-4 leading-tight title-serif">
-                Staffora<span className="text-accent">.</span>
-                <span className="text-accent block text-2xl md:text-3xl font-medium mt-1">
+              <h1 className="text-4xl md:text-5xl font-extrabold text-neutral-900 mb-4 leading-tight title-serif">
+                Staffora<span className="text-neutral-900">.</span>
+                <span className="text-neutral-700 block text-2xl md:text-3xl font-medium mt-1">
                   Smart Face Attendance
                 </span>
               </h1>
 
-              <p className="text-base text-muted mb-8 max-w-2xl mx-auto">
-                Next-generation biometric identification and smart analytics platform for enterprise workforce management.
+              <p className="text-base text-neutral-500 mb-8 max-w-2xl mx-auto">
+                Biometric identification platform for enterprise workforce management.
               </p>
 
-              {/* Current Time Display */}
-              <div className="inline-flex items-center gap-3 bg-surface px-6 py-3 rounded-2xl shadow-sm border border-border">
-                <Clock className="h-5 w-5 text-accent" />
+              <div className="inline-flex items-center gap-3 bg-white px-6 py-3 rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.04)] border border-neutral-200">
+                <Clock className="h-5 w-5 text-neutral-700" />
                 <div className="text-left">
-                  <p className="text-xs text-muted uppercase tracking-wider font-semibold">Current Time</p>
-                  <p className="text-lg font-bold text-ink font-mono">
+                  <p className="text-[10px] text-neutral-500 uppercase tracking-wider font-semibold">Current Time</p>
+                  <p className="text-lg font-bold text-neutral-900 font-mono">
                     {currentTime.toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                   </p>
                 </div>
               </div>
             </motion.div>
 
-            {/* Guide Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -93,7 +90,6 @@ function HomePage() {
               <FaceDetectionGuide />
             </motion.div>
 
-            {/* Main Attendance Card */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -101,14 +97,14 @@ function HomePage() {
               className="flex justify-center"
             >
               <div className="w-full max-w-2xl">
-                <div className="bg-surface p-10 rounded-3xl border border-border shadow-sm">
-                  <div className="text-center mb-8">
-                    <div className="w-20 h-20 bg-accent rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-md">
-                      <Camera className="h-10 w-10 text-surface" />
+                <div className="bg-white p-8 rounded-lg border border-neutral-200 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+                  <div className="text-center mb-6">
+                    <div className="w-16 h-16 bg-neutral-900 rounded-lg flex items-center justify-center mx-auto mb-4 shadow-sm">
+                      <Camera className="h-8 w-8 text-white" />
                     </div>
-                    <h2 className="text-2xl font-bold text-ink mb-3 title-serif">Mark Attendance</h2>
-                    <p className="text-muted text-sm">
-                      Align your face to capture secure biometric check-in/out
+                    <h2 className="text-xl font-bold text-neutral-900 mb-2">Mark Attendance</h2>
+                    <p className="text-neutral-500 text-sm">
+                      Capture your face to record check-in/out
                     </p>
                   </div>
 
@@ -124,33 +120,30 @@ function HomePage() {
                     <motion.div
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      className="bg-red-50 border border-red-200 p-6 rounded-2xl"
+                      className="bg-red-50 border border-red-200 p-4 rounded-lg"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                          <Camera className="h-5 w-5 text-red-600" />
+                        <div className="w-9 h-9 bg-red-100 rounded-lg flex items-center justify-center">
+                          <Camera className="h-4 w-4 text-red-600" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-red-800">Verification Error</h3>
-                          <p className="text-red-600 text-sm">{error}</p>
+                          <h3 className="font-semibold text-red-800 text-sm">Verification Error</h3>
+                          <p className="text-red-600 text-xs">{error}</p>
                         </div>
                       </div>
                     </motion.div>
                   )}
                 </div>
-
-
               </div>
             </motion.div>
           </div>
         </div>
 
-        {/* Footer */}
-        <footer className="border-t border-border bg-surface mt-12">
+        <footer className="border-t border-neutral-200 bg-white mt-12">
           <div className="container mx-auto px-6 py-6">
             <div className="text-center">
-              <p className="text-muted text-xs font-semibold tracking-wide uppercase">
-                © {new Date().getFullYear()} Staffora Inc. All rights reserved.
+              <p className="text-neutral-500 text-xs font-semibold tracking-wide uppercase">
+                &copy; {new Date().getFullYear()} Staffora Inc.
               </p>
             </div>
           </div>

@@ -135,23 +135,23 @@ export function AttendanceForm({ onSuccess, onError, onLoading }: AttendanceForm
     <div className="w-full space-y-6">
       {/* Status Header */}
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
-        <div className="inline-flex items-center gap-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 px-6 py-3 rounded-2xl border border-emerald-200 dark:border-emerald-800 shadow-sm">
+        <div className="inline-flex items-center gap-3 bg-neutral-100 text-neutral-700 px-4 py-2 rounded-lg border border-neutral-200">
           {captureStatus === "idle" && (
             <>
-              <Camera className="h-5 w-5" />
-              <span className="font-medium">Siap untuk Absensi</span>
+              <Camera className="h-4 w-4" />
+              <span className="text-sm font-medium">Siap untuk Absensi</span>
             </>
           )}
           {captureStatus === "capturing" && (
             <>
-              <div className="w-5 h-5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
-              <span className="font-medium">Mengambil Foto...</span>
+              <div className="w-4 h-4 border-2 border-neutral-700 border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-sm font-medium">Mengambil Foto...</span>
             </>
           )}
           {captureStatus === "processing" && (
             <>
-              <Loader2 className="h-5 w-5 animate-spin" />
-              <span className="font-medium">Memproses Absensi...</span>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-sm font-medium">Memproses Absensi...</span>
             </>
           )}
         </div>
@@ -164,20 +164,15 @@ export function AttendanceForm({ onSuccess, onError, onLoading }: AttendanceForm
           animate={{ opacity: 1 }}
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center"
         >
-          <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-2xl border border-emerald-200 dark:border-gray-700 max-w-md mx-4">
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full flex items-center justify-center mx-auto shadow-lg">
-                <Loader2 className="h-8 w-8 text-white animate-spin" />
+          <div className="bg-white rounded-lg p-6 shadow-xl border border-neutral-200 max-w-md mx-4">
+            <div className="text-center space-y-3">
+              <div className="w-14 h-14 bg-neutral-900 rounded-lg flex items-center justify-center mx-auto">
+                <Loader2 className="h-7 w-7 text-white animate-spin" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Memproses Absensi</h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                Sedang memverifikasi wajah dan mencatat kehadiran karyawan...
+              <h3 className="text-lg font-semibold text-neutral-900">Memproses Absensi</h3>
+              <p className="text-sm text-neutral-500">
+                Sedang memverifikasi wajah dan mencatat kehadiran...
               </p>
-              <div className="flex justify-center space-x-1">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce delay-100"></div>
-                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce delay-200"></div>
-              </div>
             </div>
           </div>
         </motion.div>

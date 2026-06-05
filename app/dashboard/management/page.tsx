@@ -17,6 +17,7 @@ import {
 import MonthSelector from "@/components/month-selector"
 import { getManagementData } from "@/lib/api"
 import { Skeleton } from "@/components/ui/skeleton"
+import { ConfirmModal } from "@/components/ui/confirm-modal"
 
 type Employee = {
   id: string
@@ -131,6 +132,12 @@ export default function ManagementPage() {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [showLeftScroll, setShowLeftScroll] = useState(false)
   const [showRightScroll, setShowRightScroll] = useState(true)
+  const [confirmState, setConfirmState] = useState<{
+    type: "delete-holiday" | "delete-employee"
+    holiday?: Holiday
+    employeeId?: string
+    employeeName?: string
+  } | null>(null)
 
   // Cache management
   const lastDataRef = useRef<{
@@ -327,14 +334,6 @@ export default function ManagementPage() {
   }
 
   const handleDeleteHoliday = async (holiday: Holiday) => {
-    if (
-      !confirm(
-        `Hapus hari libur "${holiday.keterangan}" pada tanggal ${new Date(holiday.tanggal).toLocaleDateString("id-ID")}?`,
-      )
-    ) {
-      return
-    }
-
     try {
       const response = await fetch("/api/karyawan/management", {
         method: "PATCH",
@@ -347,10 +346,10 @@ export default function ManagementPage() {
       })
 
       if (response.ok) {
-        await fetchEmployeesAndSettings(true)
-        alert("Hari libur berhasil dihapus")
+        setHolidays((prev) => prev.filter((h) => h.id !== holiday.id))
       } else {
-        alert("Gagal menghapus hari libur")
+        const data = await response.json()
+        alert(data.error || "Gagal menghapus hari libur")
       }
     } catch (error) {
       console.error("Error deleting holiday:", error)
@@ -488,14 +487,6 @@ export default function ManagementPage() {
   }
 
   const handleDeleteEmployee = async (employeeId: string, employeeName: string) => {
-    if (
-      !confirm(
-        `Apakah Anda yakin ingin menghapus data karyawan "${employeeName}"?\n\nSemua data absensi karyawan ini akan ikut terhapus.`,
-      )
-    ) {
-      return
-    }
-
     try {
       const response = await fetch("/api/karyawan/management", {
         method: "DELETE",
@@ -709,37 +700,32 @@ export default function ManagementPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="flex flex-1 flex-col gap-6 p-6 bg-background min-h-screen">
-        {/* Header Skeleton */}
-        <div className="flex items-center gap-4 border-b border-border pb-6">
+      <div className="flex flex-1 flex-col gap-6 p-6 min-h-screen">
+        <div className="flex items-center gap-4 border-b border-neutral-200 pb-6">
           <div className="flex flex-col gap-2 flex-1">
-            <Skeleton className="h-8 w-48" />
-            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-8 w-48 rounded-md" />
+            <Skeleton className="h-4 w-32 rounded-md" />
           </div>
-          <Skeleton className="h-10 w-28 rounded-md" />
+          <Skeleton className="h-10 w-28 rounded-lg" />
         </div>
-
-        {/* Search & Controls Skeleton */}
-        <div className="flex flex-col lg:flex-row gap-4 p-6 bg-card rounded-md border border-border shadow-sm mb-6">
-          <Skeleton className="h-10 flex-1 rounded-md" />
-          <Skeleton className="h-10 w-48 rounded-md" />
-          <Skeleton className="h-10 w-32 rounded-md" />
+        <div className="flex flex-col lg:flex-row gap-4 p-6 bg-white rounded-lg border border-neutral-200 shadow-[0_1px_2px_rgba(0,0,0,0.04)] mb-6">
+          <Skeleton className="h-10 flex-1 rounded-lg" />
+          <Skeleton className="h-10 w-48 rounded-lg" />
+          <Skeleton className="h-10 w-32 rounded-lg" />
         </div>
-
-        {/* Table Skeleton */}
-        <div className="bg-card rounded-md border border-border shadow-sm overflow-hidden p-6">
+        <div className="bg-white rounded-lg border border-neutral-200 shadow-[0_1px_2px_rgba(0,0,0,0.04)] overflow-hidden p-6">
           <div className="space-y-4">
-            <div className="flex gap-4 border-b border-border pb-4">
-              <Skeleton className="h-6 w-16" />
-              <Skeleton className="h-6 w-48" />
-              <Skeleton className="h-6 w-32" />
-              <Skeleton className="h-6 flex-1" />
+            <div className="flex gap-4 border-b border-neutral-200 pb-4">
+              <Skeleton className="h-6 w-16 rounded-md" />
+              <Skeleton className="h-6 w-48 rounded-md" />
+              <Skeleton className="h-6 w-32 rounded-md" />
+              <Skeleton className="h-6 flex-1 rounded-md" />
             </div>
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="flex gap-4 items-center py-3 border-b border-border/40">
+              <div key={i} className="flex gap-4 items-center py-3 border-b border-neutral-200/40">
                 <Skeleton className="h-8 w-16 rounded-md" />
-                <Skeleton className="h-6 w-48" />
-                <Skeleton className="h-6 w-32" />
+                <Skeleton className="h-6 w-48 rounded-md" />
+                <Skeleton className="h-6 w-32 rounded-md" />
                 <div className="flex gap-2 flex-1">
                   <Skeleton className="h-6 w-8 rounded-md" />
                   <Skeleton className="h-6 w-8 rounded-md" />
@@ -756,30 +742,17 @@ export default function ManagementPage() {
   // Error state
   if (errorMessage) {
     return (
-      <div className="flex flex-1 flex-col gap-4 p-4 bg-background min-h-screen">
+      <div className="flex flex-1 flex-col gap-4 p-4 min-h-screen">
         <div className="flex items-center justify-center h-64">
           <div className="text-center max-w-md">
-            <div className="bg-red-100 dark:bg-red-900/30 p-4 rounded-md mb-4">
-              <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-2" />
-              <h2 className="text-lg font-semibold text-red-700 dark:text-red-300 mb-2">Terjadi Kesalahan</h2>
-              <p className="text-red-600 dark:text-red-400">{errorMessage}</p>
+            <div className="bg-red-50 border border-red-200 p-4 rounded-lg mb-4">
+              <AlertCircle className="h-10 w-10 text-red-500 mx-auto mb-2" />
+              <h2 className="text-sm font-semibold text-red-700 mb-2">Terjadi Kesalahan</h2>
+              <p className="text-xs text-red-600">{errorMessage}</p>
             </div>
-            <button
-              onClick={handleManualRefresh}
-              disabled={isRefreshing}
-              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-            >
-              {isRefreshing ? (
-                <>
-                  <RefreshCw className="h-4 w-4 inline-block mr-2 animate-spin" />
-                  Memuat...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="h-4 w-4 inline-block mr-2" />
-                  Coba Lagi
-                </>
-              )}
+            <button onClick={handleManualRefresh} disabled={isRefreshing}
+              className="px-4 py-2 bg-neutral-900 hover:bg-neutral-800 disabled:bg-neutral-300 text-white rounded-lg transition-colors text-sm font-medium">
+              {isRefreshing ? <><RefreshCw className="h-4 w-4 inline mr-2 animate-spin" />Memuat...</> : <><RefreshCw className="h-4 w-4 inline mr-2" />Coba Lagi</>}
             </button>
           </div>
         </div>
@@ -788,29 +761,22 @@ export default function ManagementPage() {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 bg-background min-h-screen">
+    <div className="flex flex-1 flex-col gap-4 p-4 min-h-screen">
       {/* Page Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">Manajemen Karyawan</h1>
-          <p className="text-gray-600 dark:text-gray-400">Kelola data karyawan dan absensi</p>
-          {lastFetchTime && (
-            <p className="text-xs text-gray-500 dark:text-gray-500">Terakhir diperbarui: {lastFetchTime}</p>
-          )}
+          <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Manajemen Karyawan</h1>
+          <p className="text-sm text-neutral-500">Kelola data karyawan dan absensi</p>
+          {lastFetchTime && <p className="text-[10px] text-neutral-400 font-mono mt-1">Terakhir: {lastFetchTime}</p>}
         </div>
         <div className="flex flex-col sm:flex-row gap-3">
-          <button
-            onClick={handleManualRefresh}
-            disabled={isRefreshing}
-            className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-          >
+          <button onClick={handleManualRefresh} disabled={isRefreshing}
+            className="flex items-center px-4 py-2.5 bg-neutral-900 hover:bg-neutral-800 disabled:bg-neutral-300 text-white rounded-lg transition-all disabled:cursor-not-allowed text-sm font-medium shadow-sm">
             <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
-            {isRefreshing ? "Memuat..." : "Refresh Data"}
+            {isRefreshing ? "Memuat..." : "Refresh"}
           </button>
-          <button
-            onClick={() => setIsSettingsModalOpen(true)}
-            className="flex items-center px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
-          >
+          <button onClick={() => setIsSettingsModalOpen(true)}
+            className="flex items-center px-4 py-2.5 bg-white text-neutral-700 border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-all text-sm font-medium shadow-sm">
             <Clock className="h-4 w-4 mr-2" />
             Atur Jam Kerja
           </button>
@@ -818,114 +784,62 @@ export default function ManagementPage() {
       </div>
 
       {/* Status Absensi */}
-      <div className="bg-white dark:bg-gray-800 rounded-md border border-border dark:border-gray-700 shadow-sm p-4 mb-6">
+      <div className="bg-white rounded-lg border border-neutral-200 shadow-[0_1px_2px_rgba(0,0,0,0.04)] p-4 mb-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Status Absensi:</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-widest text-neutral-600">Status Absensi</h3>
           <div className="flex items-center">
-            <div
-              className={`h-2 w-2 rounded-full ${
-                isWithinCheckInTime() ? "bg-green-500 animate-pulse" : "bg-red-500"
-              } mr-2`}
-            ></div>
-            <span className="text-sm font-medium">
-              {isWithinCheckInTime() ? "Sistem Absensi Aktif" : "Sistem Absensi Tidak Aktif"}
-            </span>
+            <div className={`h-2 w-2 rounded-full ${isWithinCheckInTime() ? "bg-emerald-500 animate-pulse" : "bg-red-500"} mr-2`} />
+            <span className="text-xs font-medium text-neutral-700">{isWithinCheckInTime() ? "Sistem Absensi Aktif" : "Sistem Absensi Tidak Aktif"}</span>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-secondary dark:bg-primary/10 rounded-md p-3">
-            <h4 className="font-medium text-gray-900 dark:text-white text-sm mb-2">Jam Masuk</h4>
-            <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
-              <div>
-                <span className="font-medium">Mulai:</span> {attendanceSettings.checkInStartTime}
-              </div>
-              <div>
-                <span className="font-medium">Selesai:</span> {attendanceSettings.lateBeforeHour}
-              </div>
+          <div className="bg-neutral-50 rounded-lg p-3">
+            <h4 className="font-medium text-neutral-900 text-xs uppercase tracking-wider mb-2">Jam Masuk</h4>
+            <div className="text-xs text-neutral-600 space-y-1">
+              <div><span className="font-medium">Mulai:</span> {attendanceSettings.checkInStartTime}</div>
+              <div><span className="font-medium">Selesai:</span> {attendanceSettings.lateBeforeHour}</div>
             </div>
           </div>
-          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-md p-3">
-            <h4 className="font-medium text-gray-900 dark:text-white text-sm mb-2">Jam Pulang</h4>
-            <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
-              <div>
-                <span className="font-medium">Mulai:</span> {attendanceSettings.checkOutStartTime}
-              </div>
-              <div>
-                <span className="font-medium">Selesai:</span> {attendanceSettings.checkOutEndTime}
-              </div>
+          <div className="bg-blue-50 rounded-lg p-3">
+            <h4 className="font-medium text-neutral-900 text-xs uppercase tracking-wider mb-2">Jam Pulang</h4>
+            <div className="text-xs text-neutral-600 space-y-1">
+              <div><span className="font-medium">Mulai:</span> {attendanceSettings.checkOutStartTime}</div>
+              <div><span className="font-medium">Selesai:</span> {attendanceSettings.checkOutEndTime}</div>
             </div>
           </div>
-          <div className="bg-secondary dark:bg-primary/10 rounded-md p-3">
-            <h4 className="font-medium text-gray-900 dark:text-white text-sm mb-2">Status Kehadiran</h4>
-            <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
-              <div>
-                <span className="inline-block w-3 h-3 rounded-full bg-green-500 mr-2"></span>
-                Hadir: Absen {attendanceSettings.checkInStartTime} - {attendanceSettings.onTimeBeforeHour}
-              </div>
-              <div>
-                <span className="inline-block w-3 h-3 rounded-full bg-yellow-500 mr-2"></span>
-                Terlambat: Absen {attendanceSettings.onTimeBeforeHour} - {attendanceSettings.lateBeforeHour}
-              </div>
-              <div>
-                <span className="inline-block w-3 h-3 rounded-full bg-red-500 mr-2"></span>
-                Tidak Hadir: Tidak absen atau absen setelah {attendanceSettings.lateBeforeHour}
-              </div>
-              <div>
-                <span className="inline-block w-3 h-3 rounded-full bg-purple-500 mr-2"></span>
-                Minggu: Hari Minggu
-              </div>
-              <div>
-                <span className="inline-block w-3 h-3 rounded-full bg-orange-500 mr-2"></span>
-                Libur: Hari Libur Khusus
-              </div>
-              <div>
-                <span className="inline-block w-3 h-3 rounded-full bg-blue-500 mr-2"></span>
-                Pulang: Absen pulang {attendanceSettings.checkOutStartTime} - {attendanceSettings.checkOutEndTime}
-              </div>
+          <div className="bg-neutral-50 rounded-lg p-3">
+            <h4 className="font-medium text-neutral-900 text-xs uppercase tracking-wider mb-2">Status Kehadiran</h4>
+            <div className="text-xs text-neutral-600 space-y-1">
+              <div><span className="inline-block w-2.5 h-2.5 rounded-full bg-green-500 mr-1.5" />Hadir: {attendanceSettings.checkInStartTime} - {attendanceSettings.onTimeBeforeHour}</div>
+              <div><span className="inline-block w-2.5 h-2.5 rounded-full bg-yellow-500 mr-1.5" />Terlambat: {attendanceSettings.onTimeBeforeHour} - {attendanceSettings.lateBeforeHour}</div>
+              <div><span className="inline-block w-2.5 h-2.5 rounded-full bg-red-500 mr-1.5" />Tidak Hadir</div>
+              <div><span className="inline-block w-2.5 h-2.5 rounded-full bg-orange-500 mr-1.5" />Libur</div>
             </div>
           </div>
-          <div className="bg-secondary dark:bg-primary/10 rounded-md p-3">
-            <h4 className="font-medium text-gray-900 dark:text-white text-sm mb-2">Hari Kerja</h4>
-            <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
-              {attendanceSettings.workDays.map((day) => DAY_OPTIONS.find((d) => d.value === day)?.label).join(", ")}
-            </div>
-            {holidays.length > 0 && (
-              <div className="text-xs text-gray-600 dark:text-gray-400">
-                <span className="font-medium">Hari Libur Bulan Ini:</span> {holidays.length} hari
-              </div>
-            )}
+          <div className="bg-neutral-50 rounded-lg p-3">
+            <h4 className="font-medium text-neutral-900 text-xs uppercase tracking-wider mb-2">Hari Kerja</h4>
+            <div className="text-xs text-neutral-600 mb-2">{attendanceSettings.workDays.map((day) => DAY_OPTIONS.find((d) => d.value === day)?.label).join(", ")}</div>
+            {holidays.length > 0 && <div className="text-xs text-neutral-600"><span className="font-medium">Hari Libur:</span> {holidays.length} hari</div>}
           </div>
         </div>
       </div>
 
       {/* Search and Filter */}
-      <div className="flex flex-col lg:flex-row gap-4 p-6 bg-white dark:bg-gray-800 rounded-md border border-border dark:border-gray-700 shadow-sm mb-6">
+      <div className="flex flex-col lg:flex-row gap-4 p-6 bg-white rounded-lg border border-neutral-200 shadow-[0_1px_2px_rgba(0,0,0,0.04)] mb-6">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Cari nama karyawan atau NIP..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-border dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-          />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+          <input type="text" placeholder="Cari nama atau NIP..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 border border-neutral-200 rounded-lg bg-white text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-900 transition-all text-sm shadow-[0_1px_2px_rgba(0,0,0,0.01)]" />
         </div>
-        <MonthSelector
-          selectedMonth={selectedMonth}
-          setSelectedMonth={setSelectedMonth}
-          selectedYear={selectedYear}
-          setSelectedYear={setSelectedYear}
-        />
-        <button
-          onClick={downloadPDF}
-          className="px-5 py-3 bg-primary hover:bg-primary/90 text-white rounded-md font-medium transition-colors"
-        >
-          Download Rekap PDF
+        <MonthSelector selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} selectedYear={selectedYear} setSelectedYear={setSelectedYear} />
+        <button onClick={downloadPDF}
+          className="px-5 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-white rounded-lg text-sm font-medium transition-all shadow-sm">
+          Download PDF
         </button>
       </div>
 
       {/* Attendance Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-md border border-border dark:border-gray-700 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-lg border border-neutral-200 shadow-[0_1px_2px_rgba(0,0,0,0.04)] overflow-hidden">
         <div className="flex relative">
           {/* Fixed Left Column - Employee Info */}
           <div className="sticky left-0 z-10">
@@ -1200,7 +1114,7 @@ export default function ManagementPage() {
                             <Edit className="h-4 w-4" />
                           </button>
                           <button
-                            onClick={() => handleDeleteEmployee(emp.id, emp.name)}
+                            onClick={() => setConfirmState({ type: "delete-employee", employeeId: emp.id, employeeName: emp.name })}
                             className="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900 rounded-md transition-colors"
                             title={`Hapus data ${emp.name}`}
                           >
@@ -1223,84 +1137,42 @@ export default function ManagementPage() {
 
       {/* Employee Edit Modal */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-md p-6 w-full max-w-md mx-4">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4 shadow-xl">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Edit Data Karyawan</h3>
-              <button
-                onClick={resetEmployeeForm}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-              >
-                <X className="h-6 w-6" />
-              </button>
+              <h3 className="text-lg font-semibold text-neutral-900">Edit Data Karyawan</h3>
+              <button onClick={resetEmployeeForm} className="text-neutral-400 hover:text-neutral-600"><X className="h-5 w-5" /></button>
             </div>
-
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Nama Lengkap *
-                </label>
-                <input
-                  type="text"
-                  value={employeeForm.name}
-                  onChange={(e) => setEmployeeForm((prev) => ({ ...prev, name: e.target.value }))}
-                  placeholder="Masukkan nama lengkap"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                />
+                <label className="text-xs font-semibold text-neutral-600 mb-1.5 block">Nama Lengkap *</label>
+                <input type="text" value={employeeForm.name} onChange={(e) => setEmployeeForm((p) => ({ ...p, name: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 border border-neutral-200 rounded-lg text-sm bg-white text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-900 transition-all shadow-[0_1px_2px_rgba(0,0,0,0.01)]" />
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">NIP *</label>
-                <input
-                  type="text"
-                  value={employeeForm.nip}
-                  onChange={(e) => setEmployeeForm((prev) => ({ ...prev, nip: e.target.value }))}
-                  placeholder="Masukkan NIP"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                />
+                <label className="text-xs font-semibold text-neutral-600 mb-1.5 block">NIP *</label>
+                <input type="text" value={employeeForm.nip} onChange={(e) => setEmployeeForm((p) => ({ ...p, nip: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 border border-neutral-200 rounded-lg text-sm bg-white text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-900 transition-all shadow-[0_1px_2px_rgba(0,0,0,0.01)]" />
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
-                <input
-                  type="email"
-                  value={employeeForm.email}
-                  onChange={(e) => setEmployeeForm((prev) => ({ ...prev, email: e.target.value }))}
-                  placeholder="Masukkan email"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                />
+                <label className="text-xs font-semibold text-neutral-600 mb-1.5 block">Email</label>
+                <input type="email" value={employeeForm.email} onChange={(e) => setEmployeeForm((p) => ({ ...p, email: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 border border-neutral-200 rounded-lg text-sm bg-white text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-900 transition-all shadow-[0_1px_2px_rgba(0,0,0,0.01)]" />
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password Baru</label>
-                <input
-                  type="password"
-                  value={employeeForm.password}
-                  onChange={(e) => setEmployeeForm((prev) => ({ ...prev, password: e.target.value }))}
-                  placeholder="Kosongkan jika tidak ingin mengubah password"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                />
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  Kosongkan jika tidak ingin mengubah password
-                </p>
+                <label className="text-xs font-semibold text-neutral-600 mb-1.5 block">Password Baru</label>
+                <input type="password" value={employeeForm.password} onChange={(e) => setEmployeeForm((p) => ({ ...p, password: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 border border-neutral-200 rounded-lg text-sm bg-white text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-900 transition-all shadow-[0_1px_2px_rgba(0,0,0,0.01)]" />
+                <p className="mt-1 text-xs text-neutral-500">Kosongkan jika tidak ingin mengubah password</p>
               </div>
             </div>
-
             <div className="flex gap-3 mt-6">
-              <button
-                onClick={handleEditEmployee}
-                disabled={!employeeForm.name.trim() || !employeeForm.nip.trim()}
-                className="flex-1 flex items-center justify-center px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-              >
-                <Save className="h-4 w-4 mr-2" />
-                Simpan Perubahan
+              <button onClick={handleEditEmployee} disabled={!employeeForm.name.trim() || !employeeForm.nip.trim()}
+                className="flex-1 px-4 py-2.5 bg-neutral-900 hover:bg-neutral-800 disabled:bg-neutral-300 text-white rounded-lg text-sm font-medium transition-all disabled:cursor-not-allowed shadow-sm">
+                <Save className="h-4 w-4 inline mr-2" />Simpan
               </button>
-              <button
-                onClick={resetEmployeeForm}
-                className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
-              >
-                Batal
-              </button>
+              <button onClick={resetEmployeeForm}
+                className="px-4 py-2.5 border border-neutral-200 text-neutral-700 rounded-lg text-sm font-medium hover:bg-neutral-50 transition-colors">Batal</button>
             </div>
           </div>
         </div>
@@ -1308,45 +1180,22 @@ export default function ManagementPage() {
 
       {/* Settings Modal */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-md p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto shadow-xl">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Pengaturan Sistem</h3>
-              <button
-                onClick={() => {
-                  setIsSettingsModalOpen(false)
-                  resetHolidayForm()
-                  setActiveTab("schedule")
-                }}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-              >
-                <X className="h-6 w-6" />
-              </button>
+              <h3 className="text-lg font-semibold text-neutral-900">Pengaturan Sistem</h3>
+              <button onClick={() => { setIsSettingsModalOpen(false); resetHolidayForm(); setActiveTab("schedule") }}
+                className="text-neutral-400 hover:text-neutral-600"><X className="h-5 w-5" /></button>
             </div>
 
-            {/* Tab Navigation */}
-            <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6">
-              <button
-                onClick={() => setActiveTab("schedule")}
-                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === "schedule"
-                    ? "border-primary text-primary dark:text-primary"
-                    : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                }`}
-              >
-                <Clock className="h-4 w-4 inline-block mr-2" />
-                Jam Kerja
+            <div className="flex border-b border-neutral-200 mb-6">
+              <button onClick={() => setActiveTab("schedule")}
+                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "schedule" ? "border-neutral-900 text-neutral-900" : "border-transparent text-neutral-500 hover:text-neutral-700"}`}>
+                <Clock className="h-4 w-4 inline mr-2" />Jam Kerja
               </button>
-              <button
-                onClick={() => setActiveTab("holidays")}
-                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === "holidays"
-                    ? "border-primary text-primary dark:text-primary"
-                    : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                }`}
-              >
-                <Calendar className="h-4 w-4 inline-block mr-2" />
-                Hari Libur
+              <button onClick={() => setActiveTab("holidays")}
+                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "holidays" ? "border-neutral-900 text-neutral-900" : "border-transparent text-neutral-500 hover:text-neutral-700"}`}>
+                <Calendar className="h-4 w-4 inline mr-2" />Hari Libur
               </button>
             </div>
 
@@ -1354,185 +1203,70 @@ export default function ManagementPage() {
             {activeTab === "schedule" && (
               <div className="space-y-6">
                 {/* Existing schedule content */}
-                <div className="border-b border-border dark:border-gray-700 pb-6">
-                  <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                    <Clock className="h-4 w-4 mr-2" />
-                    Pengaturan Waktu Absensi
-                  </h4>
+                <div className="border-b border-neutral-200 pb-6">
+                  <h4 className="text-sm font-semibold text-neutral-900 mb-4 flex items-center"><Clock className="h-4 w-4 mr-2" />Pengaturan Waktu Absensi</h4>
                   <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        1. Waktu Mulai Absen Masuk
-                      </label>
-                      <input
-                        type="time"
-                        value={attendanceSettings.checkInStartTime}
-                        onChange={(e) =>
-                          setAttendanceSettings((prev) => ({ ...prev, checkInStartTime: e.target.value }))
-                        }
-                        className="w-full px-3 py-2 border border-border dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                      />
-                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                        Waktu mulai karyawan bisa melakukan absensi masuk
-                      </p>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        2. Batas Waktu Tepat Waktu
-                      </label>
-                      <input
-                        type="time"
-                        value={attendanceSettings.onTimeBeforeHour}
-                        onChange={(e) =>
-                          setAttendanceSettings((prev) => ({ ...prev, onTimeBeforeHour: e.target.value }))
-                        }
-                        className="w-full px-3 py-2 border border-border dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                      />
-                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                        Absen masuk sebelum jam ini akan dianggap Hadir (tepat waktu)
-                      </p>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        3. Batas Waktu Terlambat
-                      </label>
-                      <input
-                        type="time"
-                        value={attendanceSettings.lateBeforeHour}
-                        onChange={(e) => setAttendanceSettings((prev) => ({ ...prev, lateBeforeHour: e.target.value }))}
-                        className="w-full px-3 py-2 border border-border dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                      />
-                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                        Absen masuk setelah jam tepat waktu dan sebelum jam ini akan dianggap Terlambat. Absen setelah
-                        jam ini atau tidak absen akan dianggap Tidak Hadir.
-                      </p>
-                    </div>
-
-                    <div className="border-t border-gray-200 dark:border-gray-600 pt-4">
-                      <h5 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-                        Pengaturan Jam Pulang
-                      </h5>
-
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            4. Waktu Mulai Absen Pulang
-                          </label>
-                          <input
-                            type="time"
-                            value={attendanceSettings.checkOutStartTime}
-                            onChange={(e) =>
-                              setAttendanceSettings((prev) => ({ ...prev, checkOutStartTime: e.target.value }))
-                            }
-                            className="w-full px-3 py-2 border border-border dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                          />
-                          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                            Waktu mulai karyawan bisa melakukan absensi pulang
-                          </p>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            5. Batas Waktu Absen Pulang
-                          </label>
-                          <input
-                            type="time"
-                            value={attendanceSettings.checkOutEndTime}
-                            onChange={(e) =>
-                              setAttendanceSettings((prev) => ({ ...prev, checkOutEndTime: e.target.value }))
-                            }
-                            className="w-full px-3 py-2 border border-border dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                          />
-                          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                            Batas waktu terakhir karyawan bisa melakukan absensi pulang
-                          </p>
-                        </div>
+                    {[
+                      { label: "1. Waktu Mulai Absen Masuk", val: attendanceSettings.checkInStartTime, set: (v: string) => setAttendanceSettings((p) => ({ ...p, checkInStartTime: v })), desc: "Waktu mulai karyawan bisa melakukan absensi masuk" },
+                      { label: "2. Batas Waktu Tepat Waktu", val: attendanceSettings.onTimeBeforeHour, set: (v: string) => setAttendanceSettings((p) => ({ ...p, onTimeBeforeHour: v })), desc: "Absen sebelum jam ini dianggap Hadir" },
+                      { label: "3. Batas Waktu Terlambat", val: attendanceSettings.lateBeforeHour, set: (v: string) => setAttendanceSettings((p) => ({ ...p, lateBeforeHour: v })), desc: "Absen setelah jam ini dianggap Tidak Hadir" },
+                    ].map(({ label, val, set, desc }) => (
+                      <div key={label}>
+                        <label className="text-xs font-semibold text-neutral-600 mb-1.5 block">{label}</label>
+                        <input type="time" value={val} onChange={(e) => set(e.target.value)}
+                          className="w-full px-3.5 py-2.5 border border-neutral-200 rounded-lg text-sm bg-white text-neutral-900 focus:outline-none focus:border-neutral-900 transition-all shadow-[0_1px_2px_rgba(0,0,0,0.01)]" />
+                        <p className="mt-1 text-xs text-neutral-500">{desc}</p>
                       </div>
+                    ))}
+                    <div className="border-t border-neutral-200 pt-4">
+                      <h5 className="text-sm font-semibold text-neutral-900 mb-3">Pengaturan Jam Pulang</h5>
+                      {[
+                        { label: "4. Waktu Mulai Absen Pulang", val: attendanceSettings.checkOutStartTime, set: (v: string) => setAttendanceSettings((p) => ({ ...p, checkOutStartTime: v })), desc: "Waktu mulai absensi pulang" },
+                        { label: "5. Batas Waktu Absen Pulang", val: attendanceSettings.checkOutEndTime, set: (v: string) => setAttendanceSettings((p) => ({ ...p, checkOutEndTime: v })), desc: "Batas akhir absensi pulang" },
+                      ].map(({ label, val, set, desc }) => (
+                        <div key={label}>
+                          <label className="text-xs font-semibold text-neutral-600 mb-1.5 block">{label}</label>
+                          <input type="time" value={val} onChange={(e) => set(e.target.value)}
+                            className="w-full px-3.5 py-2.5 border border-neutral-200 rounded-lg text-sm bg-white text-neutral-900 focus:outline-none focus:border-neutral-900 transition-all shadow-[0_1px_2px_rgba(0,0,0,0.01)]" />
+                          <p className="mt-1 text-xs text-neutral-500">{desc}</p>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                  <div className="mt-3 p-3 bg-secondary dark:bg-primary/20 rounded-md border border-border dark:border-border">
-                    <div className="flex">
-                      <AlertCircle className="h-5 w-5 text-primary dark:text-primary mr-2 flex-shrink-0" />
-                      <p className="text-xs text-primary dark:text-primary-foreground">
-                        Sistem absensi hanya akan aktif dari Waktu Mulai Absen sampai Batas Waktu Terlambat. Karyawan
-                        hanya bisa melakukan absensi selama sistem aktif.
-                      </p>
-                    </div>
+                  <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                    <div className="flex"><AlertCircle className="h-4 w-4 text-amber-600 mr-2 flex-shrink-0" /><p className="text-xs text-amber-800">Sistem absensi hanya aktif dari Waktu Mulai Absen sampai Batas Waktu Terlambat.</p></div>
                   </div>
                 </div>
 
-                {/* Work Days */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Hari Kerja</label>
+                  <label className="text-xs font-semibold text-neutral-600 mb-3 block">Hari Kerja</label>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {DAY_OPTIONS.map((day) => (
-                      <label key={day.value} className="flex items-center space-x-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={attendanceSettings.workDays.includes(day.value)}
-                          onChange={() => handleWorkDayToggle(day.value)}
-                          className="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary dark:focus:ring-primary dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                        />
-                        <span className="text-sm text-gray-700 dark:text-gray-300">{day.label}</span>
+                      <label key={day.value} className="flex items-center space-x-2 cursor-pointer text-sm text-neutral-700">
+                        <input type="checkbox" checked={attendanceSettings.workDays.includes(day.value)} onChange={() => handleWorkDayToggle(day.value)}
+                          className="w-4 h-4 rounded border-neutral-300 text-neutral-900 focus:ring-neutral-900" />
+                        <span>{day.label}</span>
                       </label>
                     ))}
                   </div>
                 </div>
 
-                {/* Preview */}
-                <div className="bg-secondary dark:bg-primary/10 rounded-md p-4">
-                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Preview Pengaturan:</h4>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                    <div>
-                      <strong>Jam Absensi Masuk:</strong> {attendanceSettings.checkInStartTime} -{" "}
-                      {attendanceSettings.lateBeforeHour}
-                    </div>
-                    <div>
-                      <strong>Jam Absensi Pulang:</strong> {attendanceSettings.checkOutStartTime} -{" "}
-                      {attendanceSettings.checkOutEndTime}
-                    </div>
-                    <div className="mt-2 pt-2 border-t border-border dark:border-border">
-                      <div>
-                        <span className="inline-block w-3 h-3 rounded-full bg-green-500 mr-2"></span>
-                        Hadir: Absen masuk {attendanceSettings.checkInStartTime} - {attendanceSettings.onTimeBeforeHour}
-                      </div>
-                      <div>
-                        <span className="inline-block w-3 h-3 rounded-full bg-yellow-500 mr-2"></span>
-                        Terlambat: Absen masuk {attendanceSettings.onTimeBeforeHour} -{" "}
-                        {attendanceSettings.lateBeforeHour}
-                      </div>
-                      <div>
-                        <span className="inline-block w-3 h-3 rounded-full bg-red-500 mr-2"></span>
-                        Tidak Hadir: Tidak absen atau absen setelah {attendanceSettings.lateBeforeHour}
-                      </div>
-                      <div>
-                        <span className="inline-block w-3 h-3 rounded-full bg-blue-500 mr-2"></span>
-                        Absen Pulang: {attendanceSettings.checkOutStartTime} - {attendanceSettings.checkOutEndTime}
-                      </div>
-                      <div>
-                        <span className="inline-block w-3 h-3 rounded-full bg-orange-500 mr-2"></span>
-                        Libur: Hari libur khusus (dapat diatur per tanggal)
-                      </div>
-                    </div>
-                    <div className="mt-2">
-                      <strong>Hari Kerja:</strong>{" "}
-                      {attendanceSettings.workDays
-                        .map((day) => DAY_OPTIONS.find((d) => d.value === day)?.label)
-                        .join(", ")}
-                    </div>
+                <div className="bg-neutral-50 rounded-lg p-4 border border-neutral-200">
+                  <h4 className="text-xs font-semibold uppercase tracking-widest text-neutral-600 mb-2">Preview</h4>
+                  <div className="text-sm text-neutral-600 space-y-1">
+                    <div><strong>Jam Masuk:</strong> {attendanceSettings.checkInStartTime} - {attendanceSettings.lateBeforeHour}</div>
+                    <div><strong>Jam Pulang:</strong> {attendanceSettings.checkOutStartTime} - {attendanceSettings.checkOutEndTime}</div>
+                    <div className="mt-2 pt-2 border-t border-neutral-200"><span className="inline-block w-2.5 h-2.5 rounded-full bg-green-500 mr-1.5" />Hadir: {attendanceSettings.checkInStartTime} - {attendanceSettings.onTimeBeforeHour}</div>
+                    <div><span className="inline-block w-2.5 h-2.5 rounded-full bg-yellow-500 mr-1.5" />Terlambat: {attendanceSettings.onTimeBeforeHour} - {attendanceSettings.lateBeforeHour}</div>
+                    <div><span className="inline-block w-2.5 h-2.5 rounded-full bg-red-500 mr-1.5" />Tidak Hadir</div>
+                    <div className="mt-2"><strong>Hari Kerja:</strong> {attendanceSettings.workDays.map((d) => DAY_OPTIONS.find((o) => o.value === d)?.label).join(", ")}</div>
                   </div>
                 </div>
 
                 <div className="flex gap-3">
-                  <button
-                    onClick={handleSaveSettings}
-                    disabled={attendanceSettings.workDays.length === 0}
-                    className="flex-1 flex items-center justify-center px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <Save className="h-4 w-4 mr-2" />
-                    Simpan Pengaturan
+                  <button onClick={handleSaveSettings} disabled={attendanceSettings.workDays.length === 0}
+                    className="flex-1 px-4 py-2.5 bg-neutral-900 hover:bg-neutral-800 disabled:bg-neutral-300 text-white rounded-lg text-sm font-medium transition-all disabled:cursor-not-allowed shadow-sm">
+                    <Save className="h-4 w-4 inline mr-2" />Simpan Pengaturan
                   </button>
                 </div>
               </div>
@@ -1541,164 +1275,81 @@ export default function ManagementPage() {
             {/* Holidays Tab Content */}
             {activeTab === "holidays" && (
               <div className="space-y-6">
-                {/* Add/Edit Holiday Form */}
-                <div className="bg-gray-50 dark:bg-gray-900/50 rounded-md p-4">
-                  <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-4">
-                    {editingHoliday ? "Edit Hari Libur" : "Tambah Hari Libur"}
-                  </h4>
+                <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-4">
+                  <h4 className="text-sm font-semibold text-neutral-900 mb-4">{editingHoliday ? "Edit Hari Libur" : "Tambah Hari Libur"}</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tanggal</label>
-                      <input
-                        type="date"
-                        value={holidayForm.tanggal}
-                        onChange={(e) => setHolidayForm((prev) => ({ ...prev, tanggal: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                      />
+                      <label className="text-xs font-semibold text-neutral-600 mb-1.5 block">Tanggal</label>
+                      <input type="date" value={holidayForm.tanggal} onChange={(e) => setHolidayForm((p) => ({ ...p, tanggal: e.target.value }))}
+                        className="w-full px-3.5 py-2.5 border border-neutral-200 rounded-lg text-sm bg-white text-neutral-900 focus:outline-none focus:border-neutral-900 transition-all shadow-[0_1px_2px_rgba(0,0,0,0.01)]" />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Keterangan
-                      </label>
-                      <input
-                        type="text"
-                        value={holidayForm.keterangan}
-                        onChange={(e) => setHolidayForm((prev) => ({ ...prev, keterangan: e.target.value }))}
+                      <label className="text-xs font-semibold text-neutral-600 mb-1.5 block">Keterangan</label>
+                      <input type="text" value={holidayForm.keterangan} onChange={(e) => setHolidayForm((p) => ({ ...p, keterangan: e.target.value }))}
                         placeholder="Contoh: Hari Raya Idul Fitri"
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                      />
+                        className="w-full px-3.5 py-2.5 border border-neutral-200 rounded-lg text-sm bg-white text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-900 transition-all shadow-[0_1px_2px_rgba(0,0,0,0.01)]" />
                     </div>
                   </div>
                   <div className="flex gap-2 mt-4">
-                    <button
-                      onClick={editingHoliday ? handleEditHoliday : handleAddHoliday}
-                      disabled={!holidayForm.tanggal || !holidayForm.keterangan.trim()}
-                      className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-                    >
+                    <button onClick={editingHoliday ? handleEditHoliday : handleAddHoliday} disabled={!holidayForm.tanggal || !holidayForm.keterangan.trim()}
+                      className="px-4 py-2.5 bg-neutral-900 hover:bg-neutral-800 disabled:bg-neutral-300 text-white rounded-lg text-sm font-medium transition-all disabled:cursor-not-allowed shadow-sm">
                       {editingHoliday ? "Update" : "Tambah"} Hari Libur
                     </button>
                     {(isAddingHoliday || editingHoliday) && (
-                      <button
-                        onClick={resetHolidayForm}
-                        className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
-                      >
-                        Batal
-                      </button>
+                      <button onClick={resetHolidayForm}
+                        className="px-4 py-2.5 border border-neutral-200 text-neutral-700 rounded-lg text-sm font-medium hover:bg-neutral-50 transition-colors">Batal</button>
                     )}
                   </div>
                 </div>
 
-                {/* Holidays List */}
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-md font-semibold text-gray-900 dark:text-white">
-                      Daftar Hari Libur ({holidays.length})
-                    </h4>
-                    <button
-                      onClick={() => {
-                        setHolidayForm({ tanggal: "", keterangan: "" })
-                        setIsAddingHoliday(true)
-                        setEditingHoliday(null)
-                      }}
-                      className="px-3 py-1 text-sm bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
-                    >
-                      + Tambah Baru
-                    </button>
+                    <h4 className="text-sm font-semibold text-neutral-900">Daftar Hari Libur ({holidays.length})</h4>
+                    <button onClick={() => { setHolidayForm({ tanggal: "", keterangan: "" }); setIsAddingHoliday(true); setEditingHoliday(null) }}
+                      className="px-3 py-1.5 bg-neutral-900 hover:bg-neutral-800 text-white rounded-lg text-xs font-medium transition-all shadow-sm">+ Tambah</button>
                   </div>
-
                   {holidays.length > 0 ? (
                     <div className="space-y-2 max-h-60 overflow-y-auto">
-                      {holidays
-                        .sort((a, b) => new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime())
-                        .map((holiday) => (
-                          <div
-                            key={holiday.id}
-                            className="flex items-center justify-between p-3 bg-white dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600"
-                          >
-                            <div className="flex-1">
-                              <div className="font-medium text-gray-900 dark:text-white">{holiday.keterangan}</div>
-                              <div className="text-sm text-gray-500 dark:text-gray-400">
-                                {new Date(holiday.tanggal).toLocaleDateString("id-ID", {
-                                  weekday: "long",
-                                  year: "numeric",
-                                  month: "long",
-                                  day: "numeric",
-                                })}
-                              </div>
-                            </div>
-                            <div className="flex gap-2">
-                              <button
-                                onClick={() => startEditHoliday(holiday)}
-                                className="p-2 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900 rounded-md transition-colors"
-                                title="Edit hari libur"
-                              >
-                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                                  />
-                                </svg>
-                              </button>
-                              <button
-                                onClick={() => handleDeleteHoliday(holiday)}
-                                className="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900 rounded-md transition-colors"
-                                title="Hapus hari libur"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </button>
-                            </div>
+                      {holidays.sort((a, b) => new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime()).map((holiday) => (
+                        <div key={holiday.id} className="flex items-center justify-between p-3 bg-white border border-neutral-200 rounded-lg">
+                          <div className="flex-1">
+                            <div className="font-medium text-neutral-900 text-sm">{holiday.keterangan}</div>
+                            <div className="text-xs text-neutral-500">{new Date(holiday.tanggal).toLocaleDateString("id-ID", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</div>
                           </div>
-                        ))}
+                          <div className="flex gap-1">
+                            <button onClick={() => startEditHoliday(holiday)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button onClick={() => setConfirmState({ type: "delete-holiday", holiday })} className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors">
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   ) : (
-                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                      <Calendar className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                      <p>Belum ada hari libur yang ditambahkan</p>
-                      <p className="text-sm">Klik Tambah Baru untuk menambah hari libur</p>
+                    <div className="text-center py-8 text-neutral-500">
+                      <Calendar className="h-10 w-10 mx-auto mb-2 opacity-40" />
+                      <p className="text-sm">Belum ada hari libur</p>
                     </div>
                   )}
                 </div>
 
-                {/* Quick Add Common Holidays */}
-                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-md p-4">
-                  <h5 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Hari Libur Umum</h5>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-                    Klik untuk menambah hari libur umum (tahun {selectedYear})
-                  </p>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h5 className="text-xs font-semibold uppercase tracking-widest text-neutral-700 mb-2">Hari Libur Umum</h5>
+                  <p className="text-xs text-neutral-500 mb-3">Klik untuk menambah (tahun {selectedYear})</p>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                     {[
                       { date: `${selectedYear}-01-01`, name: "Tahun Baru" },
                       { date: `${selectedYear}-08-17`, name: "Hari Kemerdekaan" },
                       { date: `${selectedYear}-12-25`, name: "Hari Natal" },
                       { date: `${selectedYear}-05-01`, name: "Hari Buruh" },
-                    ].map((commonHoliday) => {
-                      const exists = holidays.some(
-                        (h) => new Date(h.tanggal).toISOString().split("T")[0] === commonHoliday.date,
-                      )
+                    ].map((ch) => {
+                      const exists = holidays.some((h) => new Date(h.tanggal).toISOString().split("T")[0] === ch.date)
                       return (
-                        <button
-                          key={commonHoliday.date}
-                          onClick={() => {
-                            if (!exists) {
-                              setHolidayForm({
-                                tanggal: commonHoliday.date,
-                                keterangan: commonHoliday.name,
-                              })
-                              setIsAddingHoliday(true)
-                              setEditingHoliday(null)
-                            }
-                          }}
-                          disabled={exists}
-                          className={`p-2 text-xs rounded-md transition-colors ${
-                            exists
-                              ? "bg-gray-200 dark:bg-gray-700 text-gray-500 cursor-not-allowed"
-                              : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-600"
-                          }`}
-                        >
-                          {commonHoliday.name}
-                          {exists && " ✓"}
+                        <button key={ch.date} onClick={() => { if (!exists) { setHolidayForm({ tanggal: ch.date, keterangan: ch.name }); setIsAddingHoliday(true); setEditingHoliday(null) } }} disabled={exists}
+                          className={`p-2 text-xs rounded-lg transition-colors ${exists ? "bg-neutral-200 text-neutral-500 cursor-not-allowed" : "bg-white text-neutral-700 hover:bg-neutral-50 border border-neutral-200"}`}>
+                          {ch.name}{exists && " ✓"}
                         </button>
                       )
                     })}
@@ -1707,22 +1358,35 @@ export default function ManagementPage() {
               </div>
             )}
 
-            {/* Close Button */}
-            <div className="flex justify-end mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <button
-                onClick={() => {
-                  setIsSettingsModalOpen(false)
-                  resetHolidayForm()
-                  setActiveTab("schedule")
-                }}
-                className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
-              >
-                Tutup
-              </button>
+            <div className="flex justify-end mt-6 pt-4 border-t border-neutral-200">
+              <button onClick={() => { setIsSettingsModalOpen(false); resetHolidayForm(); setActiveTab("schedule") }}
+                className="px-4 py-2 border border-neutral-200 text-neutral-700 rounded-lg text-sm font-medium hover:bg-neutral-50 transition-colors">Tutup</button>
             </div>
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        open={confirmState !== null}
+        onOpenChange={(open) => { if (!open) setConfirmState(null) }}
+        title={confirmState?.type === "delete-employee" ? "Hapus Karyawan" : "Hapus Hari Libur"}
+        description={
+          confirmState?.type === "delete-employee"
+            ? `Apakah Anda yakin ingin menghapus data karyawan "${confirmState.employeeName}"? Semua data absensi akan ikut terhapus.`
+            : `Hapus hari libur "${confirmState?.holiday?.keterangan}" pada tanggal ${confirmState?.holiday?.tanggal ? new Date(confirmState.holiday.tanggal).toLocaleDateString("id-ID") : ""}?`
+        }
+        confirmLabel="Hapus"
+        cancelLabel="Batal"
+        variant="danger"
+        onConfirm={() => {
+          if (confirmState?.type === "delete-employee" && confirmState.employeeId) {
+            handleDeleteEmployee(confirmState.employeeId, confirmState.employeeName || "")
+          } else if (confirmState?.type === "delete-holiday" && confirmState.holiday) {
+            handleDeleteHoliday(confirmState.holiday)
+          }
+          setConfirmState(null)
+        }}
+      />
     </div>
   )
 }
